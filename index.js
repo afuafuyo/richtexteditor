@@ -238,6 +238,35 @@ XEditor.prototype = {
             .replace(/&#8203;/g, '');
     },
     /**
+     * 获取 ubb 内容
+     *
+     * @param {Object} mergeTags
+     */
+    getUbb: function(mergeTags) {
+        var tag = /<(\/)?([a-z][a-z0-9]*\b[^>]*)>/gi;
+        var mt = undefined === mergeTags ? {
+            'div': 'p',
+            'code': 'pre',
+            'strong': 'b',
+            'em': 'i'
+        } : mergeTags;
+        
+        var content = this.getContent();
+        
+        // 替换标签
+        for(var k in mt) {
+            content = content.replace(new RegExp('<(\\/)?' + k, 'gi'), function(m, p){
+                return undefined === p ? '<' + mt[k] : '</' + mt[k];
+            });
+        }
+        
+        return content.replace(tag, function(match, p1, p2){
+            return undefined === p1
+                ? '[' + p2 + ']'
+                : '[/' + p2 + ']';
+        });
+    },
+    /**
      * 销毁
      */
     destroy: function() {

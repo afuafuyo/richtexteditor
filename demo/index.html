@@ -14,6 +14,7 @@
     <button onclick="getContent()">获取内容</button>
     <button onclick="getPlainText()">获取text内容</button>
     <button onclick="destroy()">销毁</button>
+    <button onclick="getUbb()">Ubb</button>
 </div>
     
 <script>
@@ -37,6 +38,9 @@ function getPlainText() {
 }
 function destroy() {
     editor.destroy();
+}
+function getUbb() {
+    console.log(editor.getUbb());
 }
 </script>
 </body>
