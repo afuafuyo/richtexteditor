@@ -85,12 +85,11 @@ XEditor.prototype = {
         var item = null;
         for(var i=0, len=this.configs.widgets.length; i<len; i++) {
             if('-' === this.configs.widgets[i]) {
-                item = this.doc.createElement('span');
+                item = this.doc.createElement('i');
                 item.className = 'xeditor-widgets-separator';
                 
             } else {
-                item = this.doc.createElement('button');
-                item.setAttribute('type', 'button');
+                item = this.doc.createElement('span');
                 item.setAttribute('data-role', this.configs.widgets[i]);
                 item.className = 'xeditor-icon xeditor-icon-' + this.configs.widgets[i];
             
@@ -631,8 +630,6 @@ XEditor.Dialog = function() {
     this.timer = 0;
     this.zIndex = 1120;
     this.id = 'xeditor-dialog-dialog';
-    
-    this.inited = false;
 };
 XEditor.Dialog.getInstance = function() {
     if(undefined === XEditor.Dialog.instance) {
@@ -644,10 +641,6 @@ XEditor.Dialog.getInstance = function() {
 XEditor.Dialog.prototype = {
     constructor: XEditor.Dialog,
     init : function() {
-        if(this.inited) {
-            return;
-        }
-        
         var _self = this;
                     
         this.wrapper = this.doc.createElement('div');
@@ -655,48 +648,40 @@ XEditor.Dialog.prototype = {
         this.setStyle(this.wrapper, {
             position: 'fixed',
             zIndex: this.zIndex,
-            top: '20%',
-            width: '400px',
+            top: '15%',
+            width: '500px',
             fontSize: '14px',
             backgroundColor: '#fff',
             wordWrap: 'break-word',
             wordBreak: 'break-all',
             borderRadius: '4px',
-            transition: 'opacity .5s linear'
+            transition: 'top .2s linear'
         });
         
         this.closeButton = this.doc.createElement('span');
-        this.closeButton.innerHTML = '&times;';
+        this.closeButton.className = 'xeditor-dialog-close';
         this.setStyle(this.closeButton, {
-            position: 'absolute',
-            zIndex: this.zIndex,
-            top: 0,
-            right: '-30px',
-            width: '26px',
-            height: '26px',
-            lineHeight: '26px',
-            cursor: 'pointer',
-            fontSize: '29px',
-            color: '#fff'
+            zIndex: this.zIndex
         });
         this.closeButton.onclick = function(e) {
             _self.close();
             XEditor.Lock.getInstance().unLock();
         };
-        
-        this.inited = true;
     },
     resetPosition: function() {
+        var _self = this;
+        
         var width = this.wrapper.clientWidth;
         var winWidth = this.doc.body.clientWidth;
         
         this.wrapper.style.left = Math.floor((winWidth - width) / 2) + 'px';
+        
+        setTimeout(function(){
+            _self.wrapper.style.top = '20%';
+        }, 20);
     },
     setStyle: function(element, styles) {
         XEditor.tools.dom.setStyle(element, styles);
-    },
-    fadeIn: function() {
-        this.wrapper.style.opacity = 1;
     },
     render: function() {
         XEditor.Lock.getInstance().lock();
@@ -710,6 +695,10 @@ XEditor.Dialog.prototype = {
             this.doc.body.removeChild(this.wrapper);
         }
         
+        this.closeButton.onclick = null;
+        this.closeButton = null;
+        this.wrapper = null;
+        
         if(null !== this.afterCloseCallback) {
             this.afterCloseCallback();
         }
@@ -721,15 +710,12 @@ XEditor.Dialog.prototype = {
             this.afterCloseCallback = afterCloseCallback
         }
         
-        this.init();
-        this.setStyle(this.wrapper, {opacity: 0});
-        
+        this.init();        
         this.wrapper.innerHTML = content;
         this.wrapper.appendChild(this.closeButton);
         
         this.render();
         this.resetPosition();
-        this.fadeIn();
     }
 };
 
@@ -1338,3 +1324,57 @@ XEditorCode.prototype = {
     }
 };
 XEditor.registerWidgetController('code', XEditorCode);
+
+/**
+ * align
+ */
+function XEditorAlign(button) {
+    this.button = button;
+}
+XEditorAlign.prototype = {
+    constructor: XEditorAlign,
+    onClick: function(editor) {
+        var range = XEditor.editing.currentRange;
+
+        if(null === range) {
+            return;
+        }
+
+        var pre = editor.doc.createElement('pre');
+        pre.appendChild(editor.doc.createElement('br'));
+        range.insertNode(pre);
+        
+        XEditor.editing.resetRangeAt(pre);
+        
+        this.changeStatus(editor);
+    },
+    changeStatus: function(editor) {
+        var range = XEditor.editing.currentRange;
+        
+        if(null === range) {
+            return;
+        }
+        
+        var container = range.getClosestContainerElement();
+        var blocked = false;
+        
+        while(-1 === container.className.indexOf('xeditor-content-root')) {
+            if('PRE' === container.nodeName.toUpperCase()) {
+                blocked = true;
+                
+                break;
+            }
+            
+            container = container.parentNode;
+        }
+        
+        if(blocked) {
+            XEditor.tools.dom.addClass(this.button, 'active');
+            
+        } else {
+            XEditor.tools.dom.removeClass(this.button, 'active');
+        }
+    }
+};
+XEditor.registerWidgetController('align', XEditorAlign);
+
