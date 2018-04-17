@@ -914,7 +914,7 @@ XEditorLink.prototype = {
     initContent: function() {
         if(this.button.className.indexOf('active') > 0) {
             var element = this.getRangeElement();
-            var inputs = this.editor.doc.querySelectorAll('input[type="text"]');
+            var inputs = XEditor.Dialog.getInstance().wrapper.querySelectorAll('input[type="text"]');
             
             var link = element.getAttribute('href');
             var text = element.innerHTML;
@@ -929,7 +929,7 @@ XEditorLink.prototype = {
         }
     },
     autoFocus: function() {
-        this.editor.doc.querySelectorAll('input[type="text"]')[1].focus();
+        XEditor.Dialog.getInstance().wrapper.querySelectorAll('input[type="text"]')[1].focus();
     },
     onClick: function(editor) {
         this.editor = editor;
