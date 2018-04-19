@@ -427,6 +427,7 @@ XEditor.editing = {
         }
         
         if(true === toEnd) {
+            // 元素节点计算偏移量是算子元素数量 其他节点计算偏移量是算内容长度
             var position = node.nodeType === 1
                 ? node.childNodes.length : node.nodeValue.length;
             range.setStart(node, position);
@@ -1429,9 +1430,13 @@ XEditorSeparator.prototype = {
             
             var role = target.getAttribute('data-role');
             
+            // 先插入一个空行
+            XEditor.editing.execCommand('insertHTML', false,
+                '<p><br /></p>');
+            
             if('solid' === role) {
                 XEditor.editing.execCommand('insertHTML', false,
-                    '<figure><hr /></figure>');
+                '<figure><hr /></figure>');
             }
         };
     },
