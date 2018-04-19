@@ -25,7 +25,7 @@ function XEditor(id, options) {
     
     this.configs = {
         reactionTime: 200,
-        widgets: ['code', '-', 'bold', 'blockquote', 'italic', '-', 'emotion', 'image', 'link'],
+        widgets: ['code', '-', 'blockquote', 'bold', 'italic', 'align', 'separator', '-', 'emotion', 'image', 'link'],
         placeholder: '',
         minHeight: '120',
         
@@ -91,7 +91,7 @@ XEditor.prototype = {
             } else {
                 item = this.doc.createElement('span');
                 item.setAttribute('data-role', this.configs.widgets[i]);
-                item.className = 'xeditor-icon xeditor-icon-' + this.configs.widgets[i];
+                item.className = 'xeditor-widgets-item xeditor-icon xeditor-icon-' + this.configs.widgets[i];
             
                 this.widgetControllerInstances[this.configs.widgets[i]] =
                     new XEditor.widgetControllers[this.configs.widgets[i]](item);
@@ -1330,51 +1330,112 @@ XEditor.registerWidgetController('code', XEditorCode);
  */
 function XEditorAlign(button) {
     this.button = button;
+    this.dropWrapper = null;
+    
+    this.init();
+    this.bindEvent();
 }
 XEditorAlign.prototype = {
     constructor: XEditorAlign,
-    onClick: function(editor) {
-        var range = XEditor.editing.currentRange;
-
-        if(null === range) {
-            return;
+    init: function() {
+        var doc = this.button.ownerDocument;
+        var item = null;
+        var text = ['左对齐', '居中', '右对齐'];
+        var role = ['left', 'center', 'right'];
+        this.dropWrapper = doc.createElement('div');
+        this.dropWrapper.className = 'xeditor-dropdown-wrapper';
+        
+        for(var i=0; i<3; i++) {
+            item = doc.createElement('span');
+            item.setAttribute('data-role', role[i]);
+            item.className = 'xeditor-align-item';
+            item.innerHTML = text[i];
+            
+            this.dropWrapper.appendChild(item);
         }
-
-        var pre = editor.doc.createElement('pre');
-        pre.appendChild(editor.doc.createElement('br'));
-        range.insertNode(pre);
         
-        XEditor.editing.resetRangeAt(pre);
-        
-        this.changeStatus(editor);
+        this.button.appendChild(this.dropWrapper);
     },
-    changeStatus: function(editor) {
-        var range = XEditor.editing.currentRange;
+    bindEvent: function() {
+        var _self = this;
         
-        if(null === range) {
-            return;
-        }
-        
-        var container = range.getClosestContainerElement();
-        var blocked = false;
-        
-        while(-1 === container.className.indexOf('xeditor-content-root')) {
-            if('PRE' === container.nodeName.toUpperCase()) {
-                blocked = true;
-                
-                break;
+        this.dropWrapper.onclick = function(e) {
+            var target = e.target;
+            var range = XEditor.editing.currentRange;
+            
+            if(null === range) {
+                return;
+            }
+            if(undefined === target) {
+                return;
             }
             
-            container = container.parentNode;
-        }
-        
-        if(blocked) {
-            XEditor.tools.dom.addClass(this.button, 'active');
+            var role = target.getAttribute('data-role');
             
-        } else {
-            XEditor.tools.dom.removeClass(this.button, 'active');
-        }
-    }
+            if('left' === role) {
+                XEditor.editing.execCommand('justifyLeft', false, null);
+                
+            } else if('center' === role) {
+                XEditor.editing.execCommand('justifyCenter', false, null);
+                
+            } else if('right' === role) {
+                XEditor.editing.execCommand('justifyRight', false, null);
+            }
+        };
+    },
+    onClick: function(editor) {},
+    changeStatus: function(editor) {}
 };
 XEditor.registerWidgetController('align', XEditorAlign);
 
+/**
+ * align
+ */
+function XEditorSeparator(button) {
+    this.button = button;
+    this.dropWrapper = null;
+    
+    this.init();
+    this.bindEvent();
+}
+XEditorSeparator.prototype = {
+    constructor: XEditorSeparator,
+    init: function() {
+        var doc = this.button.ownerDocument;
+        this.dropWrapper = doc.createElement('div');
+        this.dropWrapper.className = 'xeditor-dropdown-wrapper';
+        
+        var item = doc.createElement('div');
+        item.setAttribute('data-role', 'solid');
+        item.className = 'xeditor-separator-item';
+        item.innerHTML = '——————';
+        
+        this.dropWrapper.appendChild(item);
+        this.button.appendChild(this.dropWrapper);
+    },
+    bindEvent: function() {
+        var _self = this;
+        
+        this.dropWrapper.onclick = function(e) {
+            var target = e.target;
+            var range = XEditor.editing.currentRange;
+            
+            if(null === range) {
+                return;
+            }
+            if(undefined === target) {
+                return;
+            }
+            
+            var role = target.getAttribute('data-role');
+            
+            if('solid' === role) {
+                XEditor.editing.execCommand('insertHTML', false,
+                    '<figure><hr /></figure>');
+            }
+        };
+    },
+    onClick: function(editor) {},
+    changeStatus: function(editor) {}
+};
+XEditor.registerWidgetController('separator', XEditorSeparator);

@@ -1,4 +1,11 @@
 /**
+ * reset
+ */
+figure:hover {
+    box-shadow: 0 0 0 2px #37C8F7;
+}
+
+/**
  * util
  */
 .xeditor-dialog-close {
@@ -74,7 +81,17 @@
     border: 0;
     outline: none;
 }
-
+.xeditor-dropdown-wrapper {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    padding: 10px 0;
+    background-color: #f1f2f3;
+    display: none;
+    box-shadow: 0 2px 4px 0 #ccd0d7;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
 
 
 /**
@@ -95,6 +112,9 @@
     margin: 0 5px;
     vertical-align: top;
     background-color: #e7eaf1;
+}
+.xeditor-widgets-item {
+    position: relative;
 }
 .xeditor-content-wrapper {}
 .xeditor-content-root {
@@ -140,6 +160,12 @@
 }
 .xeditor-icon-italic {
     background-position: 10px -276px;
+}
+.xeditor-icon-align {
+    background-position: 8px -455px;
+}
+.xeditor-icon-separator {
+    background-position: 6px -388px;
 }
 .xeditor-icon-code {
     background-position: 6px -589px;
@@ -263,3 +289,37 @@
     opacity: 0;
     cursor: pointer;
 }
+
+/* align */
+.xeditor-align-item {
+    display: block;
+    width: 60px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color .2s linear;
+}
+.xeditor-align-item:hover {
+    background-color: #fff;
+}
+.xeditor-icon-align:hover .xeditor-dropdown-wrapper {
+    display: block;
+}
+
+/* separator */
+.xeditor-separator-item {
+    width: 120px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+}
+.xeditor-separator-item:hover {
+    background-color: #fff;
+    cursor: pointer;
+}
+.xeditor-icon-separator:hover .xeditor-dropdown-wrapper {
+    display: block;
+}
+
