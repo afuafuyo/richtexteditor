@@ -120,6 +120,7 @@ figure:hover {
 .xeditor-content-root {
     padding: 12px 20px;
     outline: none;
+    overflow: auto;
 }
 
 

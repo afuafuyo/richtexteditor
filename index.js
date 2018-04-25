@@ -28,6 +28,7 @@ function XEditor(id, options) {
         widgets: ['code', '-', 'blockquote', 'bold', 'italic', 'align', 'separator', '-', 'emotion', 'image', 'link'],
         placeholder: '',
         minHeight: '120',
+        maxHeight: '500',
         
         // upload url
         server: ''
@@ -111,6 +112,7 @@ XEditor.prototype = {
         this.root.contentEditable = true;
         this.root.setAttribute('spellcheck', false);
         this.root.style.minHeight = this.configs.minHeight + 'px';
+        this.root.style.maxHeight = this.configs.maxHeight + 'px';
         
         this.root.innerHTML = this.defaultHtml;
         
