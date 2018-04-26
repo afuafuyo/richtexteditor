@@ -1392,7 +1392,7 @@ XEditorAlign.prototype = {
 XEditor.registerWidgetController('align', XEditorAlign);
 
 /**
- * align
+ * separator
  */
 function XEditorSeparator(button) {
     this.button = button;
