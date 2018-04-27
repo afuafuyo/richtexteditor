@@ -1,8 +1,35 @@
 /**
  * reset
  */
-figure:hover {
+figure {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+figure img {
+    max-width: 100%;
+}
+figure img:hover {
     box-shadow: 0 0 0 2px #37C8F7;
+}
+figure figcaption {
+    min-width: 100px;
+    max-width: 80%;
+    line-height: 1.5;
+    margin: 0 auto;
+    padding: 10px 0;
+    color: #999;
+    font-size: 14px;
+    cursor: text;
+    outline: none;
+    border-bottom: 1px solid #e4e6e8;
+}
+figure figcaption:empty::after {
+    content: '输入图片注释';
+    color: #f1f2f3;
+}
+figure figcaption:focus::after {
+    content: '';
 }
 
 /**
