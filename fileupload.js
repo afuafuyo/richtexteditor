@@ -5,7 +5,7 @@
  *
  * maybe need IE10+
  *
- * @author yu
+ * @author afu
  *
  * eg.
  *
@@ -95,7 +95,7 @@ XFileUpload.prototype = {
     fireEvent: function(eventName, data, message) {
         var handler = eventName + 'Handler';
         
-        if('function' !== typeof this[handler]) {
+        if(null === this[handler]) {
             return;
         }
         
@@ -267,7 +267,7 @@ XFileUpload.prototype = {
         }
         
         this.uploadAsBinary(file);
-    },
+    }
 };
 XFileUpload.Queue = function() {
     this.headNode = null;
