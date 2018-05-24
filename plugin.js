@@ -670,8 +670,9 @@ XEditor.registerWidgetController('align', XEditorAlign);
 /**
  * separator
  */
-function XEditorSeparator(button) {
+function XEditorSeparator(button, editor) {
     this.button = button;
+    this.editor = editor;
     this.dropWrapper = null;
     
     this.init();
@@ -716,6 +717,9 @@ XEditorSeparator.prototype = {
                 XEditor.editing.execCommand('insertHTML', false,
                 '<figure><hr /></figure>');
             }
+            
+            // 光标移动末尾
+            _self.editor.resetRangeAtEndElement(true);
         };
     },
     onClick: function(editor) {},

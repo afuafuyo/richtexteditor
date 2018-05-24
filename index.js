@@ -95,7 +95,7 @@ XEditor.prototype = {
                 item.className = 'xeditor-widgets-item xeditor-icon xeditor-icon-' + this.configs.widgets[i];
             
                 this.widgetControllerInstances[this.configs.widgets[i]] =
-                    new XEditor.widgetControllers[this.configs.widgets[i]](item);
+                    new XEditor.widgetControllers[this.configs.widgets[i]](item, this);
             }
             
             this.widgetsWrapper.appendChild(item);
@@ -408,6 +408,11 @@ XEditor.tools = {
 XEditor.editing = {
     // 记录光标位置
     currentRange: null,
+    /**
+     * 缓存当前 range
+     *
+     * @param {Range} range
+     */
     saveCurrentRange: function(range) {
         if(undefined !== range) {
             XEditor.editing.currentRange = range;
@@ -421,6 +426,12 @@ XEditor.editing = {
             XEditor.editing.currentRange = getRange;
         }
     },
+    /**
+     * 设置 range 到某个节点
+     *
+     * @param {Node} node
+     * @param {Boolean} toEnd
+     */
     resetRangeAt: function(node, toEnd) {
         var range = XEditor.Range.createNativeRange();
         
@@ -443,6 +454,9 @@ XEditor.editing = {
         XEditor.editing.saveCurrentRange(new XEditor.Range(range));
         XEditor.editing.resumeSelection();
     },
+    /**
+     * 重新设置 selection 中的 range
+     */
     resumeSelection: function() {
         if(null === XEditor.editing.currentRange) {
             return;
