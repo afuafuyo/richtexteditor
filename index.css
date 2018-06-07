@@ -119,6 +119,29 @@ figure figcaption:focus::after {
     border-bottom-right-radius: 2px;
     border-bottom-left-radius: 2px;
 }
+.xeditor-pop-wrapper {
+    position: absolute;
+    top: 36px;
+    left: 0;
+    min-width: 200px;
+    min-height: 100px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 0px 2px 0px #ccd0d7;
+}
+.xeditor-pop-wrapper:before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 5px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #c6c6c6;
+    border-left: 10px solid transparent;
+}
 
 
 /**
