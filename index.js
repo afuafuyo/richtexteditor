@@ -154,8 +154,7 @@ XEditor.prototype = {
         }
     },
     handlerWidgetClickEvent: function(e) {
-        e = e || window.event;
-        var target = e.target || e.srcElement;
+        var target = e.target;
         
         var role = target.getAttribute('data-role');
         
@@ -307,7 +306,7 @@ XEditor.prototype = {
             delete this.events[eventName];
             
         } else {
-            for(let i=0,len=this.events[eventName].length; i<len; i++) {
+            for(var i=0,len=this.events[eventName].length; i<len; i++) {
                 if(handler === this.events[eventName][i]) {
                     this.events[eventName].splice(i, 1);
                 }
@@ -735,4 +734,3 @@ XEditor.Dialog.prototype = {
         this.resetPosition();
     }
 };
-

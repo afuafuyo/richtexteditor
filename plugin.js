@@ -36,41 +36,50 @@ XEditor.registerWidgetController('bold', XEditorBold);
 /**
  * emotion
  */
-function XEditorEmotion(button) {
-    this.editor = null;
-    this.html =
-['<div class="xeditor-emotion-wrapper">',
-    '<div class="xeditor-dialog-tabs">',
-        '<a class="active" href="javascript:;">精选</a>',
-    '</div>',
-    '<div class="xeditor-emotion-content">',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="高兴" data-em="(^_^)">(^_^)</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="难过" data-em="(＞﹏＜)">(＞﹏＜)</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="哼" data-em="(￣ヘ￣o)">(￣ヘ￣o)</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="哭" data-em="(╥﹏╥)">(╥﹏╥)</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="害怕" data-em="o((⊙﹏⊙))o">o((⊙﹏⊙))o</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="赞" data-em="d===(￣▽￣*)b">d===(￣▽￣*)b</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="爱你" data-em="(づ￣3￣)づ╭❤">(づ￣3￣)づ╭❤</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="害羞" data-em="(✿◡‿◡)">(✿◡‿◡)</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="无奈" data-em="╮(╯＿╰)╭">╮(╯＿╰)╭</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="惊讶" data-em="(⊙ˍ⊙)">(⊙ˍ⊙)</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="汗" data-em="(-_-!)">(-_-!)</a>',
-        '<a class="xeditor-emotion-item" href="javascript:;" title="加油" data-em="ᕦ(ò_óˇ)ᕤ">ᕦ(ò_óˇ)ᕤ</a>',
-    '</div>',
-'</div>'].join('');
+function XEditorEmotion(button, editor) {
+    this.button = button;
+    this.editor = editor;
+    
+    this.init();
+    this.bindEvent();
 }
 XEditorEmotion.prototype = {
     constructor: XEditorEmotion,
-    close: function() {
-        XEditor.Lock.getInstance().unLock();
-        XEditor.Dialog.getInstance().close();
+    init: function() {
+        var html =
+            ['<div class="xeditor-emotion-wrapper">',
+                '<div class="xeditor-dialog-tabs">',
+                    '<a class="active" href="javascript:;">精选</a>',
+                '</div>',
+                '<div class="xeditor-emotion-content">',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="高兴" data-em="(^_^)">(^_^)</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="难过" data-em="(＞﹏＜)">(＞﹏＜)</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="哼" data-em="(￣ヘ￣o)">(￣ヘ￣o)</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="哭" data-em="(╥﹏╥)">(╥﹏╥)</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="害怕" data-em="o((⊙﹏⊙))o">o((⊙﹏⊙))o</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="赞" data-em="d===(￣▽￣*)b">d===(￣▽￣*)b</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="爱你" data-em="(づ￣3￣)づ╭❤">(づ￣3￣)づ╭❤</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="害羞" data-em="(✿◡‿◡)">(✿◡‿◡)</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="无奈" data-em="╮(╯＿╰)╭">╮(╯＿╰)╭</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="惊讶" data-em="(⊙ˍ⊙)">(⊙ˍ⊙)</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="汗" data-em="(-_-!)">(-_-!)</a>',
+                    '<a class="xeditor-emotion-item" href="javascript:;" title="加油" data-em="ᕦ(ò_óˇ)ᕤ">ᕦ(ò_óˇ)ᕤ</a>',
+                '</div>',
+            '</div>'].join('');
+       
+        var doc = this.button.ownerDocument;
+        
+        var wrapper = doc.createElement('div');
+        wrapper.className = 'xeditor-pop-wrapper';
+        wrapper.innerHTML = html;
+        
+        this.button.appendChild(wrapper);
     },
     bindEvent: function() {
         var _self = this;
-        var wrap = this.editor.doc.querySelector('.xeditor-emotion-content');
+        var wrap = this.button.firstChild.querySelector('.xeditor-emotion-content');
         wrap.onclick = function(e) {
-            e = e || window.event;
-            var target = e.target || e.srcElement;
+            var target = e.target;
             
             var em = target.getAttribute('data-em');
             
@@ -81,14 +90,34 @@ XEditorEmotion.prototype = {
             }
         };
         wrap = null;
+        
+        // 点击空白关闭
+        this.button.ownerDocument.body.addEventListener('click', function(e) {
+            var canClose = true;
+            var target = e.target;
+            
+            do {
+                if(target.nodeName.toUpperCase() === 'BODY') {
+                    break;
+                }
+                
+                if(target.className.indexOf('xeditor-icon-emotion') >= 0
+                    || target.className.indexOf('xeditor-emotion-wrapper') >= 0) {
+                    canClose = false;
+                    break;
+                }
+            } while(null !== (target = target.parentNode));
+            
+            if(canClose) {
+                _self.close();
+            }
+        });
+    },
+    close: function() {
+        this.button.firstChild.style.display = 'none';
     },
     onClick: function(editor) {
-        this.editor = editor;
-        
-        var dialog = XEditor.Dialog.getInstance();
-        dialog.show(this.html);
-        
-        this.bindEvent();
+        this.button.firstChild.style.display = 'block';
     }
 };
 XEditor.registerWidgetController('emotion', XEditorEmotion);
@@ -109,7 +138,7 @@ function XEditorLink(button) {
         '<div class="xeditor-inputtext-wrapper active"><input type="text" placeholder="输入链接地址"></div>',
     '</div>',
     '<div class="xeditor-dialog-footer">',
-        '<button type="button" class="xeditor-btn xeditor-btn-primary" data-role="ok">插入图片</button>',
+        '<button type="button" class="xeditor-btn xeditor-btn-primary" data-role="ok">插入链接</button>',
         '<span>&nbsp;</span>',
         '<button type="button" class="xeditor-btn" data-role="cancel">取消</button>',
     '</div>',
@@ -141,8 +170,7 @@ XEditorLink.prototype = {
         var inputs = wrap.querySelectorAll('input[type="text"]');
         
         wrap.onclick = function(e) {
-            e = e || window.event;
-            var target = e.target || e.srcElement;
+            var target = e.target;
             var nodeName = target.nodeName.toUpperCase();
             
             if('INPUT' === nodeName) {
@@ -294,10 +322,8 @@ XEditorImage.prototype = {
         previewBox.firstChild.src = this.defaultImage;
         
         // tab 切换 确定取消 删除图片
-        wrapper.onclick = function(e) {
-            e = e || window.event;
-            
-            var target = e.target || e.srcElement;
+        wrapper.onclick = function(e) {            
+            var target = e.target;
             var role = target.getAttribute('data-role');
             
             if(null === role) {
