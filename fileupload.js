@@ -275,7 +275,7 @@ XFileUpload.Queue = function() {
     this.size = 0;
 };
 XFileUpload.Queue.prototype.add = function(data) {
-    var node = new XFileUpload.Queue.Node(data, null);
+    var node = new XFileUpload.QueueNode(data, null);
     
     if(0 === this.size) {
         this.headNode = node;
@@ -328,7 +328,7 @@ XFileUpload.Queue.prototype.toArray = function() {
     
     return ret;
 },
-XFileUpload.Queue.Node = function(data, next) {
+XFileUpload.QueueNode = function(data, next) {
     this.data = data;
     this.next = next;
 };

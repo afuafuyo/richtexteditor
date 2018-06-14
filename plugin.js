@@ -417,6 +417,8 @@ XEditorImage.prototype = {
         };
         this.uploader.filesQueuedCompleteHandler = function(obj) {
             // todo some other things
+            // eg. 设置一些 post 参数
+            // _self.uploader.setPostParam('token', 'xxxxx');
             _self.uploader.startUpload();
         };
         this.uploader.uploadProgressHandler = function(file, percent) {
