@@ -415,6 +415,7 @@ XEditorImage.prototype = {
         this.uploader.fileQueuedHandler = function(file) {
             _self.renderProgressView(file);
         };
+        // 选完文件手动调用上传
         this.uploader.filesQueuedCompleteHandler = function(obj) {
             // todo some other things
             // eg. 设置一些 post 参数
