@@ -29,6 +29,7 @@ function XEditor(id, options) {
         placeholder: '',
         minHeight: '120',
         maxHeight: '500',
+        contentClassName: '',
         
         // upload url
         server: ''
@@ -108,7 +109,7 @@ XEditor.prototype = {
         this.root = this.doc.createElement('div');
         
         this.contentWrapper.className = 'xeditor-content-wrapper';
-        this.root.className = 'xeditor-content-root';
+        this.root.className = 'xeditor-content-root' + ('' === this.configs.contentClassName ? '' : ' ' + this.configs.contentClassName);
         this.root.contentEditable = true;
         this.root.setAttribute('spellcheck', false);
         this.root.style.minHeight = this.configs.minHeight + 'px';
