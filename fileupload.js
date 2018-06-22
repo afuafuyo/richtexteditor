@@ -73,7 +73,7 @@ XFileUpload = function(id, options) {
         ,withCredentials: false
         
         ,auto: false
-        ,accept: '.jpg, .jpeg, .png, .gif'
+        ,accept: 'image/jpg, image/jpeg, image/png, image/gif'
         ,fileSizeLimit: 1024 * 1024  // 1Mb
     };
     
@@ -122,7 +122,7 @@ XFileUpload.prototype = {
             _self.xhr.onreadystatechange = null;
             
             if(200 === _self.xhr.status) {
-                _self.fireEvent('uploadSuccess', file, _self.xhr.responseText)
+                _self.fireEvent('uploadSuccess', file, _self.xhr.responseText);
             }
             
             // 上传下一个
@@ -336,10 +336,25 @@ XFileUpload.File = function(file) {
     this.nativeFile = file;
     
     this.id = 'xef' + XFileUpload.File.uuid++;
+    /**
+     * The name of the file referenced by the File object
+     */
     this.name = file.name;
+    /**
+     * The size of the file in bytes
+     */
     this.size = file.size;
+    /**
+     * A string, containing the media type. eg. "image/png"
+     */
     this.type = file.type;
+    /**
+     * A string, file type extension. eg. "png"
+     */
     this.extension = file.type.substring(file.type.indexOf('/') + 1);
+    /**
+     * The last modified time of the file
+     */
     this.lastModified = file.lastModified;
 };
 XFileUpload.File.uuid = 0;
