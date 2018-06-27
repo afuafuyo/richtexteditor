@@ -1,8 +1,9 @@
 /**
  * bold
  */
-function XEditorBold(button) {
+function XEditorBold(button, editor) {
     this.button = button;
+    // this.editor = editor;
 }
 XEditorBold.prototype = {
     constructor: XEditorBold,
@@ -125,9 +126,9 @@ XEditor.registerWidgetController('emotion', XEditorEmotion);
 /**
  * link
  */
-function XEditorLink(button) {
+function XEditorLink(button, editor) {
     this.button = button;
-    this.editor = null;
+    this.editor = editor;
     this.html =
 ['<div class="xeditor-link-wrapper">',
     '<div class="xeditor-link-title">',
@@ -237,9 +238,7 @@ XEditorLink.prototype = {
     autoFocus: function() {
         XEditor.Dialog.getInstance().wrapper.querySelectorAll('input[type="text"]')[1].focus();
     },
-    onClick: function(editor) {
-        this.editor = editor;
-        
+    onClick: function(editor) {        
         var dialog = XEditor.Dialog.getInstance();
         dialog.show(this.html);
         
@@ -270,9 +269,9 @@ XEditor.registerWidgetController('link', XEditorLink);
 /**
  * image
  */
-function XEditorImage(button) {
+function XEditorImage(button, editor) {
     this.button = button;
-    this.editor = null;
+    this.editor = editor;
     this.html =
 ['<div class="xeditor-uploadimage-wrapper">',
     '<div class="xeditor-dialog-tabs">',
@@ -391,9 +390,7 @@ XEditorImage.prototype = {
             previewBox.firstChild.src = '' === value ? _self.defaultImage : value;
         };
     },
-    onClick: function(editor) {
-        this.editor = editor;
-        
+    onClick: function(editor) {        
         var dialog = XEditor.Dialog.getInstance();
         dialog.show(this.html);
         
@@ -595,11 +592,20 @@ XEditorCode.prototype = {
             return;
         }
 
-        var pre = editor.doc.createElement('pre');
-        pre.appendChild(editor.doc.createElement('br'));
-        range.insertNode(pre);
+        var container = range.getClosestContainerElement();
+        var html = container.innerHTML;
+        var node = null;
         
-        XEditor.editing.resetRangeAt(pre);
+        if('PRE' === container.nodeName.toUpperCase()) {
+            node = editor.doc.createElement('p');
+        } else {
+            node = editor.doc.createElement('pre');
+        }
+        
+        node.innerHTML = html;
+        container.parentNode.replaceChild(node, container);
+        
+        XEditor.editing.resetRangeAt(node, true);
         
         this.changeStatus(editor);
     },

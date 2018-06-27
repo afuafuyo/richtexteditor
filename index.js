@@ -4,6 +4,20 @@
  * rich text editor for IE9+
  *
  * @author afu
+ *
+ * eg.
+ *
+ * 1. prepare a element to render editor
+ * <div id="wrapper"></div>
+ *
+ * 2. init editor
+ * new XEditor('wrapper', {
+ *     widgets: ['blockquote', 'bold', '-', 'emotion', 'image', 'link'],
+ *     placeholder: '',
+ *     minHeight: '120',
+ *     maxHeight: '500'
+ * });
+ *
  */
 'use strict';
 
@@ -212,12 +226,14 @@ XEditor.prototype = {
     resetRangeAtEndElement: function(toEnd) {
         XEditor.editing.resetRangeAt(this.root.lastChild, toEnd);
     },
+    
     /**
      * 获取内容
      */
     getContent: function() {
         return this.root.innerHTML.replace(/&#8203;/g, '');
     },
+    
     /**
      * 设置内容
      *
@@ -230,6 +246,7 @@ XEditor.prototype = {
         
         this.resetRangeAtEndElement();
     },
+    
     /**
      * 获取纯文本内容
      */
@@ -238,6 +255,7 @@ XEditor.prototype = {
             .filterTags(this.root.innerHTML)
             .replace(/&#8203;/g, '');
     },
+    
     /**
      * 获取 ubb 内容
      *
@@ -267,6 +285,7 @@ XEditor.prototype = {
                 : '[/' + p2 + ']';
         });
     },
+    
     /**
      * 销毁
      */
@@ -280,6 +299,7 @@ XEditor.prototype = {
         this.contentWrapper = null;
         this.root = null;
     },
+    
     fireEvent: function(eventName, data) {
         var handlersArray = this.events[eventName];
         
@@ -291,6 +311,7 @@ XEditor.prototype = {
             handlersArray[i](this, data);
         }
     },
+    
     addEventListener: function(eventName, handler) {
         if(undefined === this.events[eventName]) {
             this.events[eventName] = [];
@@ -298,6 +319,7 @@ XEditor.prototype = {
         
         this.events[eventName].push(handler);
     },
+    
     removeEventListener: function(eventName, handler) {
         if(undefined === this.events[eventName]) {
             return;
