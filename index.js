@@ -149,10 +149,12 @@ XEditor.prototype = {
         };
         
         // content
+        this.root.onkeydown = function(e) {
+            _self.handlerKeydownEvent(e);
+        };
         this.root.onkeyup = function(e) {
             _self.handlerKeyupEvent(e);
         };
-        
         this.root.onclick = function(e) {
             _self.handlerContentClickEvent(e);
         };
@@ -188,19 +190,25 @@ XEditor.prototype = {
         
         this.widgetControllerInstances[role].onClick(this);
     },
+    handlerKeydownEvent: function(e) {
+        this.fireEvent('keydown', null);
+    },
     handlerKeyupEvent: function(e) {
         if(0 === this.root.innerHTML.length) {
             // setContent 会调用 saveCurrentRange
-            // 但是每次按键弹起时不一定走这个逻辑
-            // 所以下面还有一个 saveCurrentRange
+            // 但是每次按键弹起时不一定 innerHTML.length === 0
+            // 所以下面手动多调用了一次 saveCurrentRange 保证按键后场景更新
             this.setContent('');
         }
         
         XEditor.editing.saveCurrentRange();
         
         this.changeWidgetsStatus();
+        
+        this.fireEvent('keyup', null);
     },
     handlerContentClickEvent: function(e) {
+        /*
         var _self = this;
         
         clearTimeout(this.reactionTimer);
@@ -210,6 +218,13 @@ XEditor.prototype = {
             _self.changeWidgetsStatus();
             
         }, this.configs.reactionTime);
+        */
+        
+        XEditor.editing.saveCurrentRange();
+        
+        this.changeWidgetsStatus();
+        
+        this.fireEvent('focus', null);
     },
     changeWidgetsStatus: function() {
         for(var widget in this.widgetControllerInstances) {
@@ -300,6 +315,12 @@ XEditor.prototype = {
         this.root = null;
     },
     
+    /**
+     * 触发事件
+     *
+     * @param {String} eventName
+     * @param {any} data
+     */
     fireEvent: function(eventName, data) {
         var handlersArray = this.events[eventName];
         
@@ -312,6 +333,12 @@ XEditor.prototype = {
         }
     },
     
+    /**
+     * 添加事件监听
+     *
+     * @param {String} eventName
+     * @param {Function} handler
+     */
     addEventListener: function(eventName, handler) {
         if(undefined === this.events[eventName]) {
             this.events[eventName] = [];
@@ -320,6 +347,12 @@ XEditor.prototype = {
         this.events[eventName].push(handler);
     },
     
+    /**
+     * 移除事件监听
+     *
+     * @param {String} eventName
+     * @param {Function} handler
+     */
     removeEventListener: function(eventName, handler) {
         if(undefined === this.events[eventName]) {
             return;
