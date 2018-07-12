@@ -22,9 +22,18 @@
     
 <script>
 XEditor.plugins['myplugin'] = function(editor) {
-    editor.addEventListener('ready', function(editor, data) {
+    editor.addEventListener('ready', (editor, data) => {
         editor.setContent('hello');
         console.log('done')
+    });
+    editor.addEventListener('keydown', () => {
+        console.log('keydown');
+    });
+    editor.addEventListener('keyup', () => {
+        console.log('keyup');
+    });
+    editor.addEventListener('focus', () => {
+        console.log('focus');
     });
 };
 var editor = new XEditor('editor', {

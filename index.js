@@ -191,7 +191,7 @@ XEditor.prototype = {
         this.widgetControllerInstances[role].onClick(this);
     },
     handlerKeydownEvent: function(e) {
-        this.fireEvent('keydown', null);
+        this.fireEvent('keydown');
     },
     handlerKeyupEvent: function(e) {
         if(0 === this.root.innerHTML.length) {
@@ -212,7 +212,7 @@ XEditor.prototype = {
         var _self = this;
         
         clearTimeout(this.reactionTimer);
-        this.reactionTimer = setTimeout(function(){            
+        this.reactionTimer = setTimeout(function(){
             XEditor.editing.saveCurrentRange();
             
             _self.changeWidgetsStatus();
