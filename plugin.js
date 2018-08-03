@@ -321,7 +321,7 @@ XEditorImage.prototype = {
         previewBox.firstChild.src = this.defaultImage;
         
         // tab 切换 确定取消 删除图片
-        wrapper.onclick = function(e) {            
+        wrapper.onclick = function(e) {
             var target = e.target;
             var role = target.getAttribute('data-role');
             
@@ -367,7 +367,7 @@ XEditorImage.prototype = {
                 // 添加图片
                 if(firstTab.className.indexOf('active') >= 0) {
                     for(var i=0,len=images.length; i<len; i++) {
-                        ret += '<figure><img src="'+ images[i].src +'"><figcaption></figcaption></figure>';
+                        ret += '<figure><img src="'+ images[i].getAttribute('src') +'"><figcaption></figcaption></figure>';
                     }
                     
                 } else {
