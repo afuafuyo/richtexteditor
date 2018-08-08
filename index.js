@@ -313,6 +313,12 @@ XEditor.prototype = {
         this.widgetsWrapper = null;
         this.contentWrapper = null;
         this.root = null;
+        
+        for(var widget in this.widgetControllerInstances) {
+            if(undefined !== this.widgetControllerInstances[widget].destroy) {
+                this.widgetControllerInstances[widget].destroy();
+            }
+        }
     },
     
     /**

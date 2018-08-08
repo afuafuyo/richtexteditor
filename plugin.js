@@ -119,7 +119,8 @@ XEditorEmotion.prototype = {
     },
     onClick: function(editor) {
         this.button.firstChild.style.display = 'block';
-    }
+    },
+    destroy: function() {}
 };
 XEditor.registerWidgetController('emotion', XEditorEmotion);
 
