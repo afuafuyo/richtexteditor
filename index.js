@@ -31,6 +31,7 @@ function XEditor(id, options) {
     this.events = {};
     this.fragment = this.doc.createDocumentFragment();
     
+    this.originData = '';
     this.defaultHtml = '<p><br></p>';
     
     this.widgetControllerInstances = {};
@@ -82,6 +83,7 @@ XEditor.prototype = {
         
         this.wrapper = this.doc.getElementById(this.id);
         this.wrapper.className = 'xeditor-wrapper';
+        this.originData = this.wrapper.innerHTML;
         this.clearElementContent(this.wrapper);
         
         this.initWidgetsStructure();
@@ -90,6 +92,12 @@ XEditor.prototype = {
         
         this.initEvent();
         this.runPlugins();
+        
+        // 还原原始内容
+        if('' !== this.originData) {
+            this.root.innerHTML = this.originData;
+        }
+        
         this.resetRangeAtEndElement();
         
         this.fireEvent('ready');
@@ -257,7 +265,7 @@ XEditor.prototype = {
     setContent: function(data) {
         this.root.innerHTML = '' === data
             ? this.defaultHtml
-            : '<p>'+ data +'</p>';
+            : data;
         
         this.resetRangeAtEndElement();
     },

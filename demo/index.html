@@ -10,7 +10,7 @@
 </head>
 <body>
 <div style="width: 600px; margin: 0 auto; border: 1px solid red">
-    <div id="editor"></div>
+    <div id="editor"><p>init data</p></div>
 </div>
 
 <div>
@@ -23,7 +23,7 @@
 <script>
 XEditor.plugins['myplugin'] = function(editor) {
     editor.addEventListener('ready', (editor, data) => {
-        editor.setContent('hello');
+        //editor.setContent('<p>hello</p>');
         console.log('done')
     });
     editor.addEventListener('keydown', () => {
