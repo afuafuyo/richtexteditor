@@ -313,20 +313,22 @@ XEditor.prototype = {
      * 销毁
      */
     destroy: function() {
-        this.deleteEvent();
-        
-        this.clearElementContent(this.wrapper);
-        
-        this.wrapper = null;
-        this.widgetsWrapper = null;
-        this.contentWrapper = null;
-        this.root = null;
-        
+        // 先删除 widgets
         for(var widget in this.widgetControllerInstances) {
             if(undefined !== this.widgetControllerInstances[widget].destroy) {
                 this.widgetControllerInstances[widget].destroy();
             }
         }
+        this.widgetControllerInstances = null;
+        
+        this.deleteEvent();
+        // 清空 dom
+        this.clearElementContent(this.wrapper);
+        
+        this.root = null;
+        this.contentWrapper = null;
+        this.widgetsWrapper = null;
+        this.wrapper = null;        
     },
     
     /**
