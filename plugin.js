@@ -239,7 +239,7 @@ XEditorLink.prototype = {
     autoFocus: function() {
         XEditor.Dialog.getInstance().wrapper.querySelectorAll('input[type="text"]')[1].focus();
     },
-    onClick: function(editor) {        
+    onClick: function(editor) {
         var dialog = XEditor.Dialog.getInstance();
         dialog.show(this.html);
         
@@ -391,7 +391,7 @@ XEditorImage.prototype = {
             previewBox.firstChild.src = '' === value ? _self.defaultImage : value;
         };
     },
-    onClick: function(editor) {        
+    onClick: function(editor) {
         var dialog = XEditor.Dialog.getInstance();
         dialog.show(this.html);
         
