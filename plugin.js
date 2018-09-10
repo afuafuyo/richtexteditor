@@ -368,11 +368,11 @@ XEditorImage.prototype = {
                 // 添加图片
                 if(firstTab.className.indexOf('active') >= 0) {
                     for(var i=0,len=images.length; i<len; i++) {
-                        ret += '<figure><img src="'+ images[i].getAttribute('src') +'"><figcaption></figcaption></figure>';
+                        ret += '<p><img src="'+ images[i].getAttribute('src') +'"></p>';
                     }
                     
                 } else {
-                    ret = '<figure><img src="'+ remoteImageInput.value +'"><figcaption></figcaption></figure>';
+                    ret = '<p><img src="'+ remoteImageInput.value +'"></p>';
                 }
                 
                 if('' !== ret) {
@@ -506,7 +506,7 @@ XEditorBlockQuote.prototype = {
             node = editor.doc.createElement('p');
         }
 
-        node.innerHTML = html;
+        node.innerHTML = '<p>' + html + '</p>';
         container.parentNode.replaceChild(node, container);
         
         XEditor.editing.resetRangeAt(node, true);
