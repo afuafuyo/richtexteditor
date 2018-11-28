@@ -134,6 +134,7 @@ XEditor.prototype = {
         this.root.className = 'xeditor-content-root' + ('' === this.configs.contentClassName ? '' : ' ' + this.configs.contentClassName);
         this.root.contentEditable = true;
         this.root.setAttribute('spellcheck', false);
+        this.root.setAttribute('data-role', 'xeditor-root');
         this.root.style.minHeight = this.configs.minHeight + 'px';
         this.root.style.maxHeight = this.configs.maxHeight + 'px';
         
@@ -595,11 +596,71 @@ XEditor.Range = function(nativeRange) {
 }
 XEditor.Range.prototype = {
     constructor: XEditor.Range,
+    /**
+     * 获取距离选区最近的元素
+     */
     getClosestContainerElement: function() {
-        var ret = this.commonAncestorContainer;
+        var node = this.commonAncestorContainer;
         
-        return 1 === ret.nodeType ? ret : ret.parentNode;
+        return 1 === node.nodeType ? node : node.parentNode;
     },
+    /**
+     * 获取距离可编辑容器最近的最外层元素
+     */
+    getOutermostElement: function() {
+        var role = 'xeditor-root';
+        
+        var node = this.commonAncestorContainer;
+        
+        // 文本或者选区 直接在可编辑容器下面 这个情况很少
+        if(3 === node.nodeType && role === node.parentNode.getAttribute('data-role')) {
+            return null;
+        }
+        if(1 === node.nodeType && role === node.getAttribute('data-role')) {
+            return null;
+        }
+        
+        while( role !== node.parentNode.getAttribute('data-role') ) {
+            node = node.parentNode;
+        }
+        
+        return node;
+    },
+    /**
+     * 当前选区是否在某个元素中
+     *
+     * @param {String} nodeName 小写标签名
+     */
+    currentInNode: function(nodeName) {
+        var ret = false;
+        var role = 'xeditor-root';
+        var node = this.commonAncestorContainer;
+        
+        // 文本或者选区 直接在可编辑容器下面 这个情况很少
+        if(3 === node.nodeType && role === node.parentNode.getAttribute('data-role')) {
+            return false;
+        }
+        if(1 === node.nodeType && role === node.getAttribute('data-role')) {
+            return false;
+        }
+        
+        while( null !== node ) {
+            if(1 === node.nodeType && role === node.getAttribute('data-role')) {
+                break;
+            }
+            
+            if(nodeName === node.nodeName.toLowerCase()) {
+                ret = true;
+                
+                break;
+            }
+            
+            node = node.parentNode;
+        }
+        
+        return ret;
+    },
+    
     setStart: function(startNode, startOffset) {
         this.nativeRange.setStart(startNode, startOffset);
     },

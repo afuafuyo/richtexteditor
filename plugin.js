@@ -14,9 +14,11 @@ XEditorBold.prototype = {
             return;
         }
         
+        // 如果没有选中文本 那么不做处理
         if(range.collapsed) {
             return;
         }
+        
         editor.execCommand('bold', false, null);
         
         this.changeStatus(editor);
@@ -136,8 +138,8 @@ function XEditorLink(button, editor) {
         '<strong>插入链接</strong>',
     '</div>',
     '<div class="xeditor-link-content">',
-        '<div class="xeditor-inputtext-wrapper"><input type="text" placeholder="输入链接文本 (可选)"></div>',
         '<div class="xeditor-inputtext-wrapper active"><input type="text" placeholder="输入链接地址"></div>',
+        '<div class="xeditor-inputtext-wrapper"><input type="text" placeholder="输入链接文本 (可选)"></div>',
     '</div>',
     '<div class="xeditor-dialog-footer">',
         '<button type="button" class="xeditor-btn xeditor-btn-primary" data-role="ok">插入链接</button>',
@@ -193,8 +195,8 @@ XEditorLink.prototype = {
                 }
                 
                 if('ok' === target.getAttribute('data-role')) {
-                    var text = inputs[0].value;
-                    var link = inputs[1].value;
+                    var link = inputs[0].value;
+                    var text = inputs[1].value;
                     
                     if(!_self.isLink(link)) {
                         return;
@@ -228,11 +230,11 @@ XEditorLink.prototype = {
             var text = element.innerHTML;
             
             // link
-            inputs[1].value = link;
+            inputs[0].value = link;
             
             // text
             if(link !== text) {
-                inputs[0].value = text;
+                inputs[1].value = text;
             }
         }
     },
@@ -496,17 +498,21 @@ XEditorBlockQuote.prototype = {
             return;
         }
 
-        var container = range.getClosestContainerElement();
-        var html = container.innerHTML;
+        var container = range.getOutermostElement();
         var node = null;
 
-        if('BLOCKQUOTE' !== container.nodeName.toUpperCase()) {
-            node = editor.doc.createElement('blockquote');
-        } else {
+        // 有格式
+        if('BLOCKQUOTE' === container.nodeName.toUpperCase()) {
             node = editor.doc.createElement('p');
+            node.innerHTML = 'P' === container.firstChild.nodeName.toUpperCase()
+                ? container.firstChild.innerHTML
+                : container.innerHTML;
+            
+        } else {
+            node = editor.doc.createElement('blockquote');
+            node.innerHTML = '<p>' + container.innerHTML + '</p>';
         }
-
-        node.innerHTML = '<p>' + html + '</p>';
+        
         container.parentNode.replaceChild(node, container);
         
         XEditor.editing.resetRangeAt(node, true);
@@ -520,18 +526,7 @@ XEditorBlockQuote.prototype = {
             return;
         }
         
-        var container = range.getClosestContainerElement();
-        var blocked = false;
-        
-        while(-1 === container.className.indexOf('xeditor-content-root')) {
-            if('BLOCKQUOTE' === container.nodeName.toUpperCase()) {
-                blocked = true;
-                
-                break;
-            }
-            
-            container = container.parentNode;
-        }
+        var blocked = range.currentInNode('blockquote');
         
         if(blocked) {
             XEditor.tools.dom.addClass(this.button, 'active');
@@ -593,17 +588,17 @@ XEditorCode.prototype = {
             return;
         }
 
-        var container = range.getClosestContainerElement();
-        var html = container.innerHTML;
+        var container = range.getOutermostElement();
         var node = null;
         
         if('PRE' === container.nodeName.toUpperCase()) {
             node = editor.doc.createElement('p');
+            
         } else {
             node = editor.doc.createElement('pre');
         }
         
-        node.innerHTML = html;
+        node.innerHTML = container.innerHTML;
         container.parentNode.replaceChild(node, container);
         
         XEditor.editing.resetRangeAt(node, true);
@@ -617,18 +612,7 @@ XEditorCode.prototype = {
             return;
         }
         
-        var container = range.getClosestContainerElement();
-        var blocked = false;
-        
-        while(-1 === container.className.indexOf('xeditor-content-root')) {
-            if('PRE' === container.nodeName.toUpperCase()) {
-                blocked = true;
-                
-                break;
-            }
-            
-            container = container.parentNode;
-        }
+        var blocked = range.currentInNode('pre');
         
         if(blocked) {
             XEditor.tools.dom.addClass(this.button, 'active');
