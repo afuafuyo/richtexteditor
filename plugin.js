@@ -21,9 +21,9 @@ XEditorBold.prototype = {
         
         editor.execCommand('bold', false, null);
         
-        this.changeStatus(editor);
+        this.statusReflect(editor);
     },
-    changeStatus: function(editor) {
+    statusReflect: function(editor) {
         var ret = editor.queryCommandState('bold');
         if(true === ret) {
             XEditor.tools.dom.addClass(this.button, 'active');
@@ -251,7 +251,7 @@ XEditorLink.prototype = {
         
         this.autoFocus();
     },
-    changeStatus: function(editor) {
+    statusReflect: function(editor) {
         var element = this.getRangeElement();
         
         if(null === element) {
@@ -517,9 +517,9 @@ XEditorBlockQuote.prototype = {
         
         XEditor.editing.resetRangeAt(node, true);
         
-        this.changeStatus(editor);
+        this.statusReflect(editor);
     },
-    changeStatus: function(editor) {
+    statusReflect: function(editor) {
         var range = XEditor.editing.currentRange;
         
         if(null === range) {
@@ -558,9 +558,9 @@ XEditorItalic.prototype = {
         }
         editor.execCommand('italic', false, null);
         
-        this.changeStatus(editor);
+        this.statusReflect(editor);
     },
-    changeStatus: function(editor) {
+    statusReflect: function(editor) {
         var ret = editor.queryCommandState('italic');
         if(true === ret) {
             XEditor.tools.dom.addClass(this.button, 'active');
@@ -603,9 +603,9 @@ XEditorCode.prototype = {
         
         XEditor.editing.resetRangeAt(node, true);
         
-        this.changeStatus(editor);
+        this.statusReflect(editor);
     },
-    changeStatus: function(editor) {
+    statusReflect: function(editor) {
         var range = XEditor.editing.currentRange;
         
         if(null === range) {
@@ -684,7 +684,7 @@ XEditorAlign.prototype = {
         };
     },
     onClick: function(editor) {},
-    changeStatus: function(editor) {}
+    statusReflect: function(editor) {}
 };
 XEditor.registerWidgetController('align', XEditorAlign);
 
@@ -744,6 +744,6 @@ XEditorSeparator.prototype = {
         };
     },
     onClick: function(editor) {},
-    changeStatus: function(editor) {}
+    statusReflect: function(editor) {}
 };
 XEditor.registerWidgetController('separator', XEditorSeparator);

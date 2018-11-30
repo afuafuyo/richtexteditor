@@ -28,7 +28,7 @@ function XEditor(id, options) {
     this.widgetsWrapper = null;
     this.contentWrapper = null;
     this.root = null;
-    this.events = {};
+    this.eventBinMap = {};
     this.fragment = this.doc.createDocumentFragment();
     
     this.originData = '';
@@ -65,12 +65,6 @@ XEditor.prototype = {
         
         return origin;
     },
-    execCommand: function(aCommandName, aShowDefaultUI, aValueArgument) {
-        XEditor.editing.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
-    },
-    queryCommandState: function(command) {
-        return XEditor.editing.queryCommandState(command);
-    },
     clearElementContent: function(element) {
         while(null !== element.firstChild) {
             element.removeChild(element.firstChild);
@@ -91,7 +85,6 @@ XEditor.prototype = {
         this.render();
         
         this.initEvent();
-        this.runPlugins();
         
         // 还原原始内容
         if('' !== this.originData) {
@@ -100,7 +93,7 @@ XEditor.prototype = {
         
         this.resetRangeAtEndElement();
         
-        this.fireEvent('ready');
+        this.fire('ready');
     },
     initWidgetsStructure: function() {
         this.widgetsWrapper = this.doc.createElement('div');
@@ -174,11 +167,6 @@ XEditor.prototype = {
         this.root.onkeyup = null;
         this.root.onclick = null;
     },
-    runPlugins: function() {
-        for(var name in XEditor.plugins) {
-            XEditor.plugins[name](this);
-        }
-    },
     handlerWidgetClickEvent: function(e) {
         var target = e.target;
         
@@ -200,7 +188,7 @@ XEditor.prototype = {
         this.widgetControllerInstances[role].onClick(this);
     },
     handlerKeydownEvent: function(e) {
-        this.fireEvent('keydown');
+        this.fire('keydown');
     },
     handlerKeyupEvent: function(e) {
         if(0 === this.root.innerHTML.length) {
@@ -212,9 +200,9 @@ XEditor.prototype = {
         
         XEditor.editing.saveCurrentRange();
         
-        this.changeWidgetsStatus();
+        this.widgetsStatusReflect();
         
-        this.fireEvent('keyup', null);
+        this.fire('keyup', null);
     },
     handlerContentClickEvent: function(e) {
         /*
@@ -224,26 +212,43 @@ XEditor.prototype = {
         this.reactionTimer = setTimeout(function(){
             XEditor.editing.saveCurrentRange();
             
-            _self.changeWidgetsStatus();
+            _self.widgetsStatusReflect();
             
         }, this.configs.reactionTime);
         */
         
         XEditor.editing.saveCurrentRange();
         
-        this.changeWidgetsStatus();
+        this.widgetsStatusReflect();
         
-        this.fireEvent('focus', null);
+        this.fire('focus', null);
     },
-    changeWidgetsStatus: function() {
+    widgetsStatusReflect: function() {
         for(var widget in this.widgetControllerInstances) {
-            this.widgetControllerInstances[widget].changeStatus
-                && this.widgetControllerInstances[widget].changeStatus(this);
+            this.widgetControllerInstances[widget].statusReflect
+                && this.widgetControllerInstances[widget].statusReflect(this);
         }
     },
     
+    
+    
+    
     /**
-     * 定位光标到内容最后一个节点
+     * 快捷 API 执行某命令
+     */
+    execCommand: function(aCommandName, aShowDefaultUI, aValueArgument) {
+        XEditor.editing.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
+    },
+    
+    /**
+     * 快捷 API 查询命令状态
+     */
+    queryCommandState: function(command) {
+        return XEditor.editing.queryCommandState(command);
+    },
+    
+    /**
+     * 快捷 API 定位光标到内容最后一个节点
      *
      * @param {Boolean} toEnd 是否将光标定位到末尾
      */
@@ -329,7 +334,69 @@ XEditor.prototype = {
         this.root = null;
         this.contentWrapper = null;
         this.widgetsWrapper = null;
-        this.wrapper = null;        
+        this.wrapper = null;
+        
+        this.fragment = null;
+        
+        // 清空事件
+        this.eventBinMap = null;
+    },
+    
+    /**
+     * 添加事件监听
+     *
+     * @param {String} eventName
+     * @param {Function} handler
+     * @param {Object} thisObject
+     */
+    on: function(eventName, handler, thisObject) {
+        if(undefined === thisObject) {
+            thisObject = null;
+        }
+        
+        var map = this.eventBinMap;
+        
+        if(undefined === map[eventName]) {
+            map[eventName] = [];
+        }
+        
+        var eventBin = {
+            target: this,
+            type: eventName,
+            handler: handler,
+            thisObject: thisObject
+        };
+        
+        map[eventName].push(eventBin);
+    },
+    
+    /**
+     * 移除事件处理器
+     *
+     * @param {String} eventName
+     * @param {Function} handler
+     * @param {Object} thisObject
+     */
+    off: function(eventName, handler, thisObject) {
+        var map = this.eventBinMap;
+        
+        if(undefined === map[eventName]) {
+            return;
+        }
+        
+        if(undefined === thisObject) {
+            thisObject = null;
+        }
+        
+        for(var i=0, len=map[eventName].length, bin=null; i<len; i++) {
+            bin = map[eventName][i];
+            
+            if(thisObject === bin.thisObject && handler === bin.handler) {
+                map[eventName].splice(i, 1);
+                
+                break;
+            }
+        }
     },
     
     /**
@@ -338,63 +405,20 @@ XEditor.prototype = {
      * @param {String} eventName
      * @param {any} data
      */
-    fireEvent: function(eventName, data) {
-        var handlersArray = this.events[eventName];
+    fire: function(eventName, data) {
+        var map = this.eventBinMap;
         
-        if(undefined === handlersArray) {
+        if(undefined === map[eventName]) {
             return;
         }
         
-        for(var i=0, len=handlersArray.length; i<len; i++) {
-            handlersArray[i](this, data);
-        }
-    },
-    
-    /**
-     * 添加事件监听
-     *
-     * @param {String} eventName
-     * @param {Function} handler
-     */
-    addEventListener: function(eventName, handler) {
-        if(undefined === this.events[eventName]) {
-            this.events[eventName] = [];
-        }
-        
-        this.events[eventName].push(handler);
-    },
-    
-    /**
-     * 移除事件监听
-     *
-     * @param {String} eventName
-     * @param {Function} handler
-     */
-    removeEventListener: function(eventName, handler) {
-        if(undefined === this.events[eventName]) {
-            return;
-        }
-        
-        if(undefined === handler) {
-            delete this.events[eventName];
+        for(var i=0, len=map[eventName].length, bin=null; i<len; i++) {
+            bin = map[eventName][i];
             
-        } else {
-            for(var i=0,len=this.events[eventName].length; i<len; i++) {
-                if(handler === this.events[eventName][i]) {
-                    this.events[eventName].splice(i, 1);
-                }
-            }
+            bin.handler.call(bin.thisObject, data);
         }
     }
 };
-
-/**
- * plugins 简单的插件
- *
- * {name: callback ...}
- *
- */
-XEditor.plugins = {};
 
 /**
  * 部件容器
