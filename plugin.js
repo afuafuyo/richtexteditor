@@ -669,16 +669,17 @@ XEditorAlign.prototype = {
                 return;
             }
             
+            var ele = range.getOutermostElement();
             var role = target.getAttribute('data-role');
             
             if('left' === role) {
-                XEditor.editing.execCommand('justifyLeft', false, null);
+                ele.style.textAlign = 'left';
                 
             } else if('center' === role) {
-                XEditor.editing.execCommand('justifyCenter', false, null);
+                ele.style.textAlign = 'center';
                 
             } else if('right' === role) {
-                XEditor.editing.execCommand('justifyRight', false, null);
+                ele.style.textAlign = 'right';
             }
         };
     },
