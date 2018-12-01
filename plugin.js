@@ -239,7 +239,7 @@ XEditorLink.prototype = {
         }
     },
     autoFocus: function() {
-        XEditor.Dialog.getInstance().wrapper.querySelectorAll('input[type="text"]')[1].focus();
+        XEditor.Dialog.getInstance().wrapper.querySelectorAll('input[type="text"]')[0].focus();
     },
     onClick: function(editor) {
         var dialog = XEditor.Dialog.getInstance();
