@@ -621,7 +621,7 @@ XEditor.Range = function(nativeRange) {
 XEditor.Range.prototype = {
     constructor: XEditor.Range,
     /**
-     * 获取距离选区最近的元素
+     * 获取距离选区最近的标签元素
      */
     getClosestContainerElement: function() {
         var node = this.commonAncestorContainer;

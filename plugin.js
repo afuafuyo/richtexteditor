@@ -150,7 +150,7 @@ function XEditorLink(button, editor) {
 }
 XEditorLink.prototype = {
     constructor: XEditorLink,
-    getRangeElement: function() {
+    getLinkElement: function() {
         var range = XEditor.editing.currentRange;
         var ret = null;
         
@@ -158,7 +158,13 @@ XEditorLink.prototype = {
             return null;
         }
         
-        return range.getClosestContainerElement();
+        var tag = range.getClosestContainerElement();
+        
+        while(null !== tag && 'A' !== tag.nodeName.toUpperCase()) {
+            tag = tag.parentNode;
+        }
+        
+        return tag;
     },
     isLink: function(link) {
         return true;
@@ -204,7 +210,7 @@ XEditorLink.prototype = {
                     
                     // 修改链接
                     if(_self.button.className.indexOf('active') > 0) {
-                        var originA = _self.getRangeElement();
+                        var originA = _self.getLinkElement();
                         
                         originA.setAttribute('href', link);
                         originA.innerHTML = (text || link);
@@ -223,11 +229,11 @@ XEditorLink.prototype = {
     },
     initContent: function() {
         if(this.button.className.indexOf('active') > 0) {
-            var element = this.getRangeElement();
+            var element = this.getLinkElement();
             var inputs = XEditor.Dialog.getInstance().wrapper.querySelectorAll('input[type="text"]');
             
             var link = element.getAttribute('href');
-            var text = element.innerHTML;
+            var text = XEditor.tools.string.filterTags(element.innerHTML);
             
             // link
             inputs[0].value = link;
@@ -252,13 +258,15 @@ XEditorLink.prototype = {
         this.autoFocus();
     },
     statusReflect: function(editor) {
-        var element = this.getRangeElement();
+        var range = XEditor.editing.currentRange;
         
-        if(null === element) {
+        if(null === range) {
             return;
         }
+        
+        var linked = range.currentInNode('a');
                 
-        if('A' === element.nodeName.toUpperCase()) {
+        if(linked) {
             XEditor.tools.dom.addClass(this.button, 'active');
             
             return;
