@@ -152,7 +152,6 @@ XEditorLink.prototype = {
     constructor: XEditorLink,
     getLinkElement: function() {
         var range = XEditor.editing.currentRange;
-        var ret = null;
         
         if(null === range) {
             return null;
