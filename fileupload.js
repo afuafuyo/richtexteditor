@@ -5,7 +5,7 @@
  *
  * maybe need IE10+
  *
- * @author afu
+ * @author 月十
  *
  * eg.
  *
@@ -37,6 +37,8 @@
  * up.uploadCompleteHandler = function() {
  *      // 队列中所有文件上传完成触发
  * }
+ *
+ * up.startUpload();
  *
  */
 XFileUpload = function(id, options) {
