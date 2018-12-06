@@ -3,7 +3,7 @@
  *
  * rich text editor for IE9+
  *
- * @author 月十
+ * @author afu
  *
  * eg.
  *

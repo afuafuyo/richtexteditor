@@ -5,7 +5,7 @@
  *
  * maybe need IE10+
  *
- * @author 月十
+ * @author afu
  *
  * eg.
  *
