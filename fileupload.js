@@ -10,7 +10,8 @@
  * eg.
  *
  * var up = new XFileUpload('elementId', {
- *      server: 'http://localhost/upload.php'
+ *      server: 'http://localhost/upload.php',
+ *      fieldName: 'file'
  * });
  *
  * up.fileQueuedHandler = function(file) {
@@ -70,7 +71,7 @@ XFileUpload = function(id, options) {
         postParams: {}
         ,headers: {}
         ,server: ''
-        ,fileName: 'xeditorfile'
+        ,fieldName: 'xeditorfile'
         ,useFormData: true
         ,withCredentials: false
         
@@ -212,7 +213,7 @@ XFileUpload.prototype = {
             fd.append(k, this.configs.postParams[k]);
         }
         
-        fd.append(this.configs.fileName, file.nativeFile);
+        fd.append(this.configs.fieldName, file.nativeFile);
         
         this.setupXHR(file);
         
