@@ -43,6 +43,8 @@ function XEditorEmotion(button, editor) {
     this.button = button;
     this.editor = editor;
     
+    this.popWrapper = null;
+    
     this.init();
     this.bindEvent();
 }
@@ -72,18 +74,22 @@ XEditorEmotion.prototype = {
        
         var doc = this.button.ownerDocument;
         
-        var wrapper = doc.createElement('div');
-        wrapper.className = 'xeditor-pop-wrapper';
-        wrapper.innerHTML = html;
+        this.popWrapper = doc.createElement('div');
+        this.popWrapper.className = 'xeditor-pop-wrapper';
+        this.popWrapper.innerHTML = html;
         
-        this.button.appendChild(wrapper);
+        this.button.appendChild(this.popWrapper);
     },
     bindEvent: function() {
         var _self = this;
-        var wrap = this.button.firstChild.querySelector('.xeditor-emotion-content');
-        wrap.onclick = function(e) {
-            var target = e.target;
+        
+        this.popWrapper.onclick = function(e) {
+            // 阻止冒泡
+            if(e.stopPropagation) {
+                e.stopPropagation();
+            }
             
+            var target = e.target;
             var em = target.getAttribute('data-em');
             
             if(null !== em) {
@@ -92,28 +98,17 @@ XEditorEmotion.prototype = {
                 _self.close();
             }
         };
-        wrap = null;
         
         // 点击空白关闭
-        this.button.ownerDocument.body.addEventListener('click', function(e) {
-            var canClose = true;
-            var target = e.target;
+        this.button.ownerDocument.addEventListener('click', function(e) {
+            var t = e.target;
             
-            do {
-                if(target.nodeName.toUpperCase() === 'BODY') {
-                    break;
-                }
-                
-                if(target.className.indexOf('xeditor-icon-emotion') >= 0
-                    || target.className.indexOf('xeditor-emotion-wrapper') >= 0) {
-                    canClose = false;
-                    break;
-                }
-            } while(null !== (target = target.parentNode));
-            
-            if(canClose) {
-                _self.close();
+            // 点击表情按钮要执行打开操作
+            if('emotion' === t.getAttribute('data-action')) {
+                return;
             }
+            
+            _self.close();
         });
     },
     close: function() {
@@ -142,9 +137,9 @@ function XEditorLink(button, editor) {
         '<div class="xeditor-inputtext-wrapper"><input type="text" placeholder="输入链接文本 (可选)"></div>',
     '</div>',
     '<div class="xeditor-dialog-footer">',
-        '<button type="button" class="xeditor-btn xeditor-btn-primary" data-role="ok">插入链接</button>',
+        '<button type="button" class="xeditor-btn xeditor-btn-primary" data-action="ok">插入链接</button>',
         '<span>&nbsp;</span>',
-        '<button type="button" class="xeditor-btn" data-role="cancel">取消</button>',
+        '<button type="button" class="xeditor-btn" data-action="cancel">取消</button>',
     '</div>',
 '</div>'].join('');
 }
@@ -193,13 +188,13 @@ XEditorLink.prototype = {
             }
             
             if('BUTTON' === nodeName) {
-                if('cancel' === target.getAttribute('data-role')) {
+                if('cancel' === target.getAttribute('data-action')) {
                     _self.close();
                     
                     return;
                 }
                 
-                if('ok' === target.getAttribute('data-role')) {
+                if('ok' === target.getAttribute('data-action')) {
                     var link = inputs[0].value;
                     var text = inputs[1].value;
                     
@@ -285,8 +280,8 @@ function XEditorImage(button, editor) {
     this.html =
 ['<div class="xeditor-uploadimage-wrapper">',
     '<div class="xeditor-dialog-tabs">',
-        '<a class="active" href="javascript:;" data-role="local">本地图片</a>',
-        '<a href="javascript:;" data-role="remote">网络图片</a>',
+        '<a class="active" href="javascript:;" data-action="local">本地图片</a>',
+        '<a href="javascript:;" data-action="remote">网络图片</a>',
     '</div>',
     '<div class="xeditor-uploadimage-content xeditor-uploadimage-content-local">',
         '<div class="xeditor-uploadimage-uploadlist">',
@@ -303,9 +298,9 @@ function XEditorImage(button, editor) {
         '<div class="xeditor-uploadimage-remote-preview"><img src=""></div>',
     '</div>',
     '<div class="xeditor-dialog-footer">',
-        '<button type="button" class="xeditor-btn xeditor-btn-primary" data-role="ok">插入图片</button>',
+        '<button type="button" class="xeditor-btn xeditor-btn-primary" data-action="ok">插入图片</button>',
         '<span>&nbsp;</span>',
-        '<button type="button" class="xeditor-btn" data-role="cancel">取消</button>',
+        '<button type="button" class="xeditor-btn" data-action="cancel">取消</button>',
     '</div>',
 '</div>'].join('');
 
@@ -333,13 +328,13 @@ XEditorImage.prototype = {
         // tab 切换 确定取消 删除图片
         wrapper.onclick = function(e) {
             var target = e.target;
-            var role = target.getAttribute('data-role');
+            var action = target.getAttribute('data-action');
             
-            if(null === role) {
+            if(null === action) {
                 return;
             }
             
-            if('local' === role || 'remote' === role) {
+            if('local' === action || 'remote' === action) {
                 var tabs = target.parentNode.querySelectorAll('a');
                 
                 for(var i=0,len=contents.length; i<len; i++) {
@@ -349,25 +344,25 @@ XEditorImage.prototype = {
                     tabs[i].className = '';
                 }
                 
-                contents['local' === role ? 0 : 1].style.display = 'block';
+                contents['local' === action ? 0 : 1].style.display = 'block';
                 target.className = 'active';
                 
                 return;
             }
             
-            if('del' === role) {
+            if('del' === action) {
                 target.parentNode.parentNode.removeChild(target.parentNode);
                 
                 return;
             }
             
-            if('cancel' === role) {
+            if('cancel' === action) {
                 _self.close();
                 
                 return;
             }
             
-            if('ok' === role) {
+            if('ok' === action) {
                 var images = imageListWrapper.querySelectorAll('img');
                 
                 var ret = '';
@@ -481,7 +476,7 @@ XEditorImage.prototype = {
         var old = doc.getElementById(file.id);
         var div = doc.createElement('div');
         div.className = 'xeditor-uploadimage-imageitem';
-        div.innerHTML = '<a data-role="del" href="javascript:;" class="xeditor-uploadimage-delete">&times;</a>'
+        div.innerHTML = '<a data-action="del" href="javascript:;" class="xeditor-uploadimage-delete">&times;</a>'
             + '<img src="'+ data.data +'">';
         
         listWrapper.insertBefore(div, old);
@@ -647,13 +642,13 @@ XEditorAlign.prototype = {
         var doc = this.button.ownerDocument;
         var item = null;
         var text = ['左对齐', '居中', '右对齐'];
-        var role = ['left', 'center', 'right'];
+        var actions = ['left', 'center', 'right'];
         this.dropWrapper = doc.createElement('div');
         this.dropWrapper.className = 'xeditor-dropdown-wrapper';
         
         for(var i=0; i<3; i++) {
             item = doc.createElement('span');
-            item.setAttribute('data-role', role[i]);
+            item.setAttribute('data-action', actions[i]);
             item.className = 'xeditor-align-item';
             item.innerHTML = text[i];
             
@@ -677,15 +672,15 @@ XEditorAlign.prototype = {
             }
             
             var ele = range.getOutermostElement();
-            var role = target.getAttribute('data-role');
+            var action = target.getAttribute('data-action');
             
-            if('left' === role) {
+            if('left' === action) {
                 ele.style.textAlign = 'left';
                 
-            } else if('center' === role) {
+            } else if('center' === action) {
                 ele.style.textAlign = 'center';
                 
-            } else if('right' === role) {
+            } else if('right' === action) {
                 ele.style.textAlign = 'right';
             }
         };
@@ -714,7 +709,7 @@ XEditorSeparator.prototype = {
         this.dropWrapper.className = 'xeditor-dropdown-wrapper';
         
         var item = doc.createElement('div');
-        item.setAttribute('data-role', 'solid');
+        item.setAttribute('data-action', 'solid');
         item.className = 'xeditor-separator-item';
         item.innerHTML = '——————';
         
@@ -735,13 +730,13 @@ XEditorSeparator.prototype = {
                 return;
             }
             
-            var role = target.getAttribute('data-role');
+            var action = target.getAttribute('data-action');
             
             // 先插入一个空行
             XEditor.editing.execCommand('insertHTML', false,
                 '<p><br /></p>');
             
-            if('solid' === role) {
+            if('solid' === action) {
                 XEditor.editing.execCommand('insertHTML', false,
                 '<figure><hr /></figure>');
             }

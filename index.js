@@ -107,7 +107,7 @@ XEditor.prototype = {
                 
             } else {
                 item = this.doc.createElement('span');
-                item.setAttribute('data-role', this.configs.widgets[i]);
+                item.setAttribute('data-action', this.configs.widgets[i]);
                 item.className = 'xeditor-widgets-item xeditor-icon xeditor-icon-' + this.configs.widgets[i];
             
                 this.widgetControllerInstances[this.configs.widgets[i]] =
@@ -170,22 +170,22 @@ XEditor.prototype = {
     handlerWidgetClickEvent: function(e) {
         var target = e.target;
         
-        var role = target.getAttribute('data-role');
+        var action = target.getAttribute('data-action');
         
         // 只有触发事件的对象才处理
-        if(null === role) {
+        if(null === action) {
             return;
         }
         
-        if(undefined === this.widgetControllerInstances[role]) {
+        if(undefined === this.widgetControllerInstances[action]) {
             return;
         }
         
-        if(undefined === this.widgetControllerInstances[role].onClick) {
-            throw new Error('The widget: '+ role +' has no onClick method');
+        if(undefined === this.widgetControllerInstances[action].onClick) {
+            throw new Error('The widget: '+ action +' has no onClick method');
         }
         
-        this.widgetControllerInstances[role].onClick(this);
+        this.widgetControllerInstances[action].onClick(this);
     },
     handlerKeydownEvent: function(e) {
         this.fire('keydown');
