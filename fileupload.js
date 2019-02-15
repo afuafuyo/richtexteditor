@@ -42,7 +42,7 @@
  * up.startUpload();
  *
  */
-XFileUpload = function(id, options) {
+var XFileUpload = function(id, options) {
     this.doc = document;
     this.fileInput = null;
     this.id = id;
