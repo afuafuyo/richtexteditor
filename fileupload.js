@@ -258,6 +258,8 @@ XFileUpload.prototype = {
         var file = this.filesQueue.take();
         
         if(null === file) {
+            this.fileInput.value = '';
+            
             this.fireEvent('uploadComplete');
             
             return;
