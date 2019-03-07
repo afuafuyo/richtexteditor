@@ -10,36 +10,31 @@
  * eg.
  *
  * var up = new XFileUpload('elementId', {
- *      server: 'http://localhost/upload.php',
+ *      server: '/api/upload',
  *      fieldName: 'file'
  * });
  *
  * up.fileQueuedHandler = function(file) {
- *      // 一个文件加入队列后触发
- *      // 可以在这里渲染上传进度页面
+ *      // called on a file added to queue
  * }
  *
  * up.filesQueuedCompleteHandler = function(obj) {
- *      // 所有文件加入队列后触发
- *      // 可以在这里调用上传方法开始上传
+ *      // called on all selected files queued
+ * 
+ *      // up.startUpload();
  * }
  *
  * up.uploadProgressHandler = function(file, percent) {
- *      // 上传进度回调
- *      // 可以在这里处理进度条
+ *      // upload progress
  * }
  *
  * up.uploadSuccessHandler = function(file, serverData) {
- *      // 一个文件上传完成触发
- *      // serverData 为服务器返回的数据
- *      // 可以在这里对服务器返回的数据进行处理
+ *      // called on a file upload success
  * }
  *
  * up.uploadCompleteHandler = function() {
- *      // 队列中所有文件上传完成触发
+ *      // called on all files upload success or fail
  * }
- *
- * up.startUpload();
  *
  */
 var XFileUpload = function(id, options) {
@@ -76,6 +71,7 @@ var XFileUpload = function(id, options) {
         ,withCredentials: false
         
         ,auto: false
+        ,multiple: false
         ,accept: 'image/jpg, image/jpeg, image/png, image/gif'
         ,fileSizeLimit: 1024 * 1024  // 1Mb
     };
@@ -152,6 +148,9 @@ XFileUpload.prototype = {
         
         this.fileInput = this.doc.getElementById(this.id);
         this.fileInput.setAttribute('accept', this.configs.accept);
+        if(this.configs.multiple) {
+            this.fileInput.setAttribute('multiple', 'multiple');
+        }
     
         this.fileInput.onchange = function(e) {
             _self.selectFiles();
