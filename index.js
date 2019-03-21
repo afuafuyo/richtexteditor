@@ -21,15 +21,15 @@
  */
 'use strict';
 
-function XEditor(id, options) {
-    this.id = id;
+function XEditor(options) {
     this.doc = document;
+    
     this.wrapper = null;
     this.widgetsWrapper = null;
     this.contentWrapper = null;
     this.root = null;
     this.eventBinMap = {};
-    this.fragment = this.doc.createDocumentFragment();
+    this.fragment = null;
     
     this.originData = '';
     this.defaultHtml = '<p><br></p>';
@@ -71,29 +71,9 @@ XEditor.prototype = {
         }
     },
     init: function(options) {
-        if(undefined !== options) {
-            this.extend(this.configs, options);
-        }
+        this.extend(this.configs, options);
         
-        this.wrapper = this.doc.getElementById(this.id);
-        this.wrapper.className = 'xeditor-wrapper';
-        this.originData = this.wrapper.innerHTML;
-        this.clearElementContent(this.wrapper);
-        
-        this.initWidgetsStructure();
-        this.initContentStructure();
-        this.render();
-        
-        this.initEvent();
-        
-        // 还原原始内容
-        if('' !== this.originData) {
-            this.root.innerHTML = this.originData;
-        }
-        
-        this.resetRangeAtEndElement();
-        
-        this.fire('ready');
+        this.fragment = this.doc.createDocumentFragment();
     },
     initWidgetsStructure: function() {
         this.widgetsWrapper = this.doc.createElement('div');
@@ -135,9 +115,6 @@ XEditor.prototype = {
         
         this.contentWrapper.appendChild(this.root);
         this.fragment.appendChild(this.contentWrapper);
-    },
-    render: function() {
-        this.wrapper.appendChild(this.fragment);
     },
     initEvent: function() {
         var _self = this;
@@ -232,6 +209,40 @@ XEditor.prototype = {
     
     
     
+    
+    /**
+     * render
+     */
+    render: function(id) {
+        // 编辑器区域
+        this.wrapper = this.doc.getElementById(id);
+        this.wrapper.className = 'xeditor-wrapper';
+        this.originData = this.wrapper.innerHTML;
+        
+        // 清空内容
+        this.clearElementContent(this.wrapper);
+        
+        // 初始化插件区
+        this.initWidgetsStructure();
+        
+        // 初始化内容区
+        this.initContentStructure();        
+        
+        // 还原原始内容
+        if('' !== this.originData) {
+            this.root.innerHTML = this.originData;
+        }
+        
+        // dom 渲染
+        this.wrapper.appendChild(this.fragment);
+        
+        // event
+        this.initEvent();
+        
+        this.resetRangeAtEndElement();
+        
+        this.fire('ready');
+    },
     
     /**
      * 快捷 API 执行某命令
@@ -339,7 +350,7 @@ XEditor.prototype = {
         this.fragment = null;
         
         // 清空事件
-        this.eventBinMap = null;
+        this.eventBinMap = {};
     },
     
     /**
@@ -526,7 +537,7 @@ XEditor.editing = {
      * 设置 range 到某个节点
      *
      * @param {Node} node
-     * @param {Boolean} toEnd
+     * @param {Boolean} toEnd 默认为 false
      */
     resetRangeAt: function(node, toEnd) {
         var range = XEditor.Range.createNativeRange();
@@ -616,7 +627,7 @@ XEditor.Range = function(nativeRange) {
     this.endContainer = nativeRange.endContainer;
     this.startOffset = nativeRange.startOffset;
     this.endOffset = nativeRange.endOffset;
-    this.commonAncestorContainer  = nativeRange.commonAncestorContainer ;
+    this.commonAncestorContainer  = nativeRange.commonAncestorContainer;
 }
 XEditor.Range.prototype = {
     constructor: XEditor.Range,
