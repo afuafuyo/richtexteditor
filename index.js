@@ -13,7 +13,6 @@
  * 2. init editor
  * new XEditor('wrapper', {
  *     widgets: ['blockquote', 'bold', '-', 'emotion', 'image', 'link'],
- *     placeholder: '',
  *     minHeight: '120',
  *     maxHeight: '500'
  * });
@@ -31,8 +30,8 @@ function XEditor(options) {
     this.eventBinMap = {};
     this.fragment = null;
     
-    this.originData = '';
-    this.defaultHtml = '<p><br></p>';
+    this.originContent = '';
+    this.defaultContent = '<p><br></p>';
     
     this.widgetControllerInstances = {};
     // 假设同一时间只会有同一个类型的动作发生 所以所有动作共用一个定时器
@@ -110,8 +109,6 @@ XEditor.prototype = {
         this.root.setAttribute('data-role', 'xeditor-root');
         this.root.style.minHeight = this.configs.minHeight + 'px';
         this.root.style.maxHeight = this.configs.maxHeight + 'px';
-        
-        this.root.innerHTML = this.defaultHtml;
         
         this.contentWrapper.appendChild(this.root);
         this.fragment.appendChild(this.contentWrapper);
@@ -217,7 +214,7 @@ XEditor.prototype = {
         // 编辑器区域
         this.wrapper = this.doc.getElementById(id);
         this.wrapper.className = 'xeditor-wrapper';
-        this.originData = this.wrapper.innerHTML;
+        this.originContent = this.wrapper.innerHTML;
         
         // 清空内容
         this.clearElementContent(this.wrapper);
@@ -229,8 +226,11 @@ XEditor.prototype = {
         this.initContentStructure();        
         
         // 还原原始内容
-        if('' !== this.originData) {
-            this.root.innerHTML = this.originData;
+        if('' === this.originContent) {
+            this.root.innerHTML = this.defaultContent;
+            
+        } else {
+            this.root.innerHTML = this.originContent;
         }
         
         // dom 渲染
@@ -281,7 +281,7 @@ XEditor.prototype = {
      */
     setContent: function(data) {
         this.root.innerHTML = '' === data
-            ? this.defaultHtml
+            ? this.defaultContent
             : data;
         
         this.resetRangeAtEndElement();
