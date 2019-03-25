@@ -134,6 +134,9 @@ XEditor.prototype = {
         this.root.onclick = function(e) {
             _self.handlerContentClickEvent(e);
         };
+        
+        // 在 PC 端 onclick 事件同时处理了 selectionchange
+        // this.doc.onselectionchange = function(e) {};
     },
     deleteEvent: function() {
         this.widgetsWrapper.onmousedown = null;
@@ -245,21 +248,7 @@ XEditor.prototype = {
     },
     
     /**
-     * 快捷 API 执行某命令
-     */
-    execCommand: function(aCommandName, aShowDefaultUI, aValueArgument) {
-        XEditor.editing.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
-    },
-    
-    /**
-     * 快捷 API 查询命令状态
-     */
-    queryCommandState: function(command) {
-        return XEditor.editing.queryCommandState(command);
-    },
-    
-    /**
-     * 快捷 API 定位光标到内容最后一个节点
+     * 定位光标到内容最后一个节点
      *
      * @param {Boolean} toEnd 是否将光标定位到末尾
      */
@@ -428,6 +417,20 @@ XEditor.prototype = {
             
             bin.handler.call(bin.thisObject, data);
         }
+    },
+    
+    /**
+     * 快捷 API 执行某命令
+     */
+    execCommand: function(aCommandName, aShowDefaultUI, aValueArgument) {
+        XEditor.editing.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
+    },
+    
+    /**
+     * 快捷 API 查询命令状态
+     */
+    queryCommandState: function(command) {
+        return XEditor.editing.queryCommandState(command);
     }
 };
 
