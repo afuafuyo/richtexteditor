@@ -150,6 +150,7 @@ figure figcaption:focus::after {
 }
 .xeditor-widgets-wrapper {
     padding: 3px 0;
+    background-color: #fff;
     border-top: 1px solid #e7eaf1;
     border-bottom: 1px solid #e7eaf1;
 }

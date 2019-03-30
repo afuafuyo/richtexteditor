@@ -5,11 +5,11 @@
     <title>Document</title>
     <link rel="stylesheet" href="../index.css">
     <script src="../index.js"></script>
-    <script src="../plugin.js"></script>
+    <script src="../widgets.js"></script>
     <script src="../fileupload.js"></script>
 </head>
 <body>
-<div style="width: 600px; margin: 0 auto; border: 1px solid red">
+<div style="width: 900px; margin: 0 auto; border: 1px solid red">
     <div id="mydemo"><p>init data</p></div>
 </div>
 
@@ -21,7 +21,53 @@
 </div>
     
 <script>
+/**
+ * 滚动定位
+ */
+function ScrollFix(editor) {
+    this.editor = editor;
+    
+    editor.on('ready', this.handler, this);
+}
+ScrollFix.prototype = {
+    constructor: ScrollFix,
+    handler: function() {
+        var _self = this;
+
+        this.bar = this.editor.widgetsWrapper;
+        this.barWidth = this.bar.clientWidth;
+        this.barOffset = XEditor.tools.dom.getOffset(this.bar);
+
+        window.addEventListener('resize', function() {
+            _self.barOffset = XEditor.tools.dom.getOffset(_self.bar);
+        });
+        window.addEventListener("scroll", function () {
+            _self.scrollHandler();
+        });
+    },
+    scrollHandler: function() {
+        var navHeight = 0;
+        
+        var startFixPos = this.barOffset.top - navHeight;
+
+        if(document.documentElement) {
+            if(document.documentElement.scrollTop > startFixPos) {
+                this.bar.style.position = 'fixed';
+                this.bar.style.zIndex = '100';
+                this.bar.style.top = navHeight + 'px';
+                this.bar.style.left = this.barOffset.left + 'px';
+                this.bar.style.width = this.barWidth + 'px';
+
+            } else {
+                this.bar.removeAttribute('style');
+            }
+        }
+    }
+};
+
+
 var editor = new XEditor({
+    plugins: [ScrollFix],
     // 图片上传地址
     server: 'http://localhost:8080/up.php'
 });

@@ -13,8 +13,7 @@
  * 2. init editor
  * new XEditor('wrapper', {
  *     widgets: ['blockquote', 'bold', '-', 'emotion', 'image', 'link'],
- *     minHeight: '120',
- *     maxHeight: '500'
+ *     minHeight: '200'
  * });
  *
  */
@@ -23,26 +22,60 @@
 function XEditor(options) {
     this.doc = document;
     
-    this.wrapper = null;
-    this.widgetsWrapper = null;
-    this.contentWrapper = null;
-    this.root = null;
-    this.eventBinMap = {};
-    this.fragment = null;
-    
-    this.originContent = '';
-    this.defaultContent = '<p><br></p>';
-    
-    this.widgetControllerInstances = {};
-    // 假设同一时间只会有同一个类型的动作发生 所以所有动作共用一个定时器
+    /**
+     * 定时器延时
+     * 假设同一时间只会有同一个类型的动作发生 所以所有动作共用一个定时器
+     */
     this.reactionTimer = 0;
     
+    /**
+     * 发布器容器
+     */
+    this.wrapper = null;
+    /**
+     * 挂件容器
+     */
+    this.widgetsWrapper = null;
+    /**
+     * 内容容器
+     */
+    this.contentWrapper = null;
+    /**
+     * 可编辑区引用
+     */
+    this.root = null;
+    /**
+     * fragment
+     */
+    this.fragment = null;
+    
+    /**
+     * 挂件缓存
+     */
+    this.widgetControllerInstances = {};
+    /**
+     * 事件映射表
+     */
+    this.eventBinMap = {};
+    
+    /**
+     * 原内容
+     */
+    this.originContent = '';
+    /**
+     * 内容为空时的默认 html
+     */
+    this.emptyContent = '<p><br></p>';
+    
+    /**
+     * 配置
+     */
     this.configs = {
         reactionTime: 200,
+        plugins: [],
         widgets: ['code', '-', 'blockquote', 'bold', 'italic', 'align', 'separator', '-', 'emotion', 'image', 'link'],
         placeholder: '',
-        minHeight: '120',
-        maxHeight: '500',
+        minHeight: '200',
         contentClassName: '',
         
         // upload url
@@ -108,7 +141,6 @@ XEditor.prototype = {
         this.root.setAttribute('spellcheck', false);
         this.root.setAttribute('data-role', 'xeditor-root');
         this.root.style.minHeight = this.configs.minHeight + 'px';
-        this.root.style.maxHeight = this.configs.maxHeight + 'px';
         
         this.contentWrapper.appendChild(this.root);
         this.fragment.appendChild(this.contentWrapper);
@@ -206,7 +238,12 @@ XEditor.prototype = {
                 && this.widgetControllerInstances[widget].statusReflect(this);
         }
     },
-    
+    runPlugins: function() {
+        // 直接执行
+        for(var i=0, len=this.configs.plugins.length; i<len; i++) {
+            new this.configs.plugins[i](this);
+        }
+    },
     
     
     
@@ -230,7 +267,7 @@ XEditor.prototype = {
         
         // 还原原始内容
         if('' === this.originContent) {
-            this.root.innerHTML = this.defaultContent;
+            this.root.innerHTML = this.emptyContent;
             
         } else {
             this.root.innerHTML = this.originContent;
@@ -244,6 +281,9 @@ XEditor.prototype = {
         
         this.resetRangeAtEndElement();
         
+        // 初始化插件
+        this.runPlugins();
+        
         this.fire('ready');
     },
     
@@ -253,6 +293,10 @@ XEditor.prototype = {
      * @param {Boolean} toEnd 是否将光标定位到末尾
      */
     resetRangeAtEndElement: function(toEnd) {
+        if(undefined === toEnd) {
+            toEnd = false;
+        }
+        
         XEditor.editing.resetRangeAt(this.root.lastChild, toEnd);
     },
     
@@ -270,7 +314,7 @@ XEditor.prototype = {
      */
     setContent: function(data) {
         this.root.innerHTML = '' === data
-            ? this.defaultContent
+            ? this.emptyContent
             : data;
         
         this.resetRangeAtEndElement();
@@ -417,25 +461,12 @@ XEditor.prototype = {
             
             bin.handler.call(bin.thisObject, data);
         }
-    },
-    
-    /**
-     * 快捷 API 执行某命令
-     */
-    execCommand: function(aCommandName, aShowDefaultUI, aValueArgument) {
-        XEditor.editing.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
-    },
-    
-    /**
-     * 快捷 API 查询命令状态
-     */
-    queryCommandState: function(command) {
-        return XEditor.editing.queryCommandState(command);
     }
 };
 
+
 /**
- * 部件容器
+ * 具有 UI 的部件
  *
  * {name: Function ...}
  *
@@ -445,183 +476,10 @@ XEditor.registerWidgetController = function(name, processer) {
     XEditor.widgetControllers[name] = processer;
 };
 
-/**
- * 工具
- */
-XEditor.tools = {
-    string: {
-        trimChar: function(str, character) {
-            if(character === str.charAt(0)) {
-                str = str.substring(1);
-            }
-            if(character === str.charAt(str.length - 1)) {
-                str = str.substring(0, str.length - 1);
-            }
-            
-            return str;
-        },
-        ucFirst: function(str) {
-            var ret = str.charAt(0).toUpperCase();
-            
-            return ret + str.substring(1);
-        },
-        filterTags: function(str, allowed) {
-            var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
-            var comments = /<!--[\s\S]*?-->/gi;
-            
-            str = str.replace(comments, '');
-            
-            if(undefined === allowed) {
-                return str.replace(tags, '');
-            }
-            
-            allowed = allowed.toLowerCase();
-            
-            return str.replace(tags, function(match, p) {
-                return allowed.indexOf('<' + p.toLowerCase() + '>') !== -1 ? match : '';
-            });
-        }
-    },
-    dom: {
-        addClass: function(element, className) {
-            if(-1 !== element.className.indexOf(className)) {
-                return;
-            }
-            
-            element.className = element.className + ' ' + className;
-        },
-        removeClass: function(element, className) {
-            var newClassName =  ' ' + element.className + ' ';
-            var replaced = newClassName.replace(' ' + className + ' ', ' ');
-            
-            element.className = XEditor.tools.string.trimChar(replaced, ' ');
-        },
-        preventDefault: function(event) {
-            if(event.preventDefault) {
-                event.preventDefault();
-            
-            } else {
-                event.returnValue = false;
-            }
-        },
-        setStyle: function(element, styles) {
-            for(var s in styles) {
-                element.style[s] = styles[s];
-            }
-        }
-    }
-};
 
 /**
- * 对外 API - Selection & Range & execCommand
+ * 选区
  */
-XEditor.editing = {
-    // 记录光标位置
-    currentRange: null,
-    /**
-     * 缓存当前 range
-     *
-     * @param {Range} range
-     */
-    saveCurrentRange: function(range) {
-        if(undefined !== range) {
-            XEditor.editing.currentRange = range;
-            
-            return;
-        }
-        
-        var getRange = XEditor.Range.getSingleRangeFromNativeSelection();
-        
-        if(null !== getRange) {
-            XEditor.editing.currentRange = getRange;
-        }
-    },
-    /**
-     * 设置 range 到某个节点
-     *
-     * @param {Node} node
-     * @param {Boolean} toEnd 默认为 false
-     */
-    resetRangeAt: function(node, toEnd) {
-        var range = XEditor.Range.createNativeRange();
-        
-        if(null === range) {
-            return;
-        }
-        
-        if(true === toEnd) {
-            // 元素节点计算偏移量是算子元素数量 其他节点计算偏移量是算内容长度
-            var position = node.nodeType === 1
-                ? node.childNodes.length : node.nodeValue.length;
-            range.setStart(node, position);
-            
-        } else {
-            range.setStart(node, 0);
-        }
-        
-        // range.insertNode(document.createTextNode('|'));
-        
-        XEditor.editing.saveCurrentRange(new XEditor.Range(range));
-        XEditor.editing.resumeSelection();
-    },
-    /**
-     * 重新设置 selection 中的 range
-     */
-    resumeSelection: function() {
-        if(null === XEditor.editing.currentRange) {
-            return;
-        }
-        
-        var selection = window.getSelection();
-        
-        if(selection.rangeCount > 0) {
-            selection.removeAllRanges();
-        }
-        
-        selection.addRange(XEditor.editing.currentRange.nativeRange);
-    },
-    diffApi: {
-        insertHTML: function(aShowDefaultUI, aValueArgument) {
-            var doc = document;
-            var range = XEditor.editing.currentRange;
-            var tmpElement = null;
-            
-            if(null === range) {
-                return;
-            }
-            
-            if(doc.queryCommandSupported('insertHTML')) {
-                doc.execCommand('insertHTML', aShowDefaultUI, aValueArgument);
-            
-                return;
-            }
-            
-            // ie
-            range.deleteContents();
-            range.collapse();
-            
-            var p = range.getClosestContainerElement();
-            p.innerHTML += aValueArgument;
-        }
-    },
-    // https://w3c.github.io/editing/execCommand.html#methods-to-query-and-execute-commands
-    execCommand: function(aCommandName, aShowDefaultUI, aValueArgument) {
-        // 执行命令前 需要知道光标的位置
-        XEditor.editing.resumeSelection();
-        
-        if(undefined !== XEditor.editing.diffApi[aCommandName]) {
-            XEditor.editing.diffApi[aCommandName](
-                aShowDefaultUI, aValueArgument);
-            
-            return;
-        }
-        
-        document.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
-    },
-    queryCommandState: function(command) {
-        return document.queryCommandState(command);
-    }
-};
 XEditor.Range = function(nativeRange) {
     this.nativeRange = nativeRange;
     
@@ -631,7 +489,7 @@ XEditor.Range = function(nativeRange) {
     this.startOffset = nativeRange.startOffset;
     this.endOffset = nativeRange.endOffset;
     this.commonAncestorContainer  = nativeRange.commonAncestorContainer;
-}
+};
 XEditor.Range.prototype = {
     constructor: XEditor.Range,
     /**
@@ -724,9 +582,7 @@ XEditor.Range.prototype = {
 XEditor.Range.getSingleRangeFromNativeSelection = function() {
     var selection = null;
     
-    if('function' === typeof window.getSelection) {
-        selection = window.getSelection();
-        
+    if( null !== (selection = XEditor.Range.getSelectionFromNative()) ) {        
         if(0 === selection.rangeCount) {
             return null;
         }
@@ -743,6 +599,213 @@ XEditor.Range.createNativeRange = function() {
     
     return null;
 };
+XEditor.Range.getSelectionFromNative = function() {
+    if('function' === typeof window.getSelection) {
+        return window.getSelection();
+    }
+    
+    return null;
+};
+
+
+/**
+ * 对外 API - Selection & Range & execCommand
+ */
+XEditor.editing = {
+    // 记录光标位置
+    currentRange: null,
+    /**
+     * 缓存当前 range
+     *
+     * @param {Range} range
+     */
+    saveCurrentRange: function(range) {
+        if(undefined !== range) {
+            XEditor.editing.currentRange = range;
+            
+            return;
+        }
+        
+        var getRange = XEditor.Range.getSingleRangeFromNativeSelection();
+        
+        if(null !== getRange) {
+            XEditor.editing.currentRange = getRange;
+        }
+    },
+    /**
+     * 设置 range 到某个节点
+     *
+     * @param {Node} node
+     * @param {Boolean} toEnd 默认为 false
+     */
+    resetRangeAt: function(node, toEnd) {
+        var range = XEditor.Range.createNativeRange();
+        
+        if(null === range) {
+            return;
+        }
+        
+        if(true === toEnd) {
+            // 元素节点计算偏移量是算子元素数量 其他节点计算偏移量是算内容长度
+            var position = node.nodeType === 1
+                ? node.childNodes.length : node.nodeValue.length;
+            range.setStart(node, position);
+            
+        } else {
+            range.setStart(node, 0);
+        }
+        
+        // range.insertNode(document.createTextNode('|'));
+        
+        XEditor.editing.saveCurrentRange(new XEditor.Range(range));
+        XEditor.editing.resumeSelection();
+    },
+    /**
+     * 重新设置 selection 中的 range
+     */
+    resumeSelection: function() {
+        if(null === XEditor.editing.currentRange) {
+            return;
+        }
+        
+        var selection = XEditor.Range.getSelectionFromNative();
+        
+        if(null === selection) {
+            return;
+        }
+        
+        if(selection.rangeCount > 0) {
+            selection.removeAllRanges();
+        }
+        
+        selection.addRange(XEditor.editing.currentRange.nativeRange);
+    },
+    diffApi: {
+        insertHTML: function(aShowDefaultUI, aValueArgument) {
+            var doc = document;
+            var range = XEditor.editing.currentRange;
+            var tmpElement = null;
+            
+            if(null === range) {
+                return;
+            }
+            
+            if(doc.queryCommandSupported('insertHTML')) {
+                doc.execCommand('insertHTML', aShowDefaultUI, aValueArgument);
+            
+                return;
+            }
+            
+            // ie
+            range.deleteContents();
+            range.collapse();
+            
+            var p = range.getClosestContainerElement();
+            p.innerHTML += aValueArgument;
+        }
+    },
+    // https://w3c.github.io/editing/execCommand.html#methods-to-query-and-execute-commands
+    execCommand: function(aCommandName, aShowDefaultUI, aValueArgument) {
+        // 执行命令前 需要知道光标的位置
+        XEditor.editing.resumeSelection();
+        
+        if(undefined !== XEditor.editing.diffApi[aCommandName]) {
+            XEditor.editing.diffApi[aCommandName](
+                aShowDefaultUI, aValueArgument);
+            
+            return;
+        }
+        
+        document.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
+    },
+    queryCommandState: function(command) {
+        return document.queryCommandState(command);
+    }
+};
+
+
+/**
+ * 工具
+ */
+XEditor.tools = {
+    string: {
+        trimChar: function(str, character) {
+            if(character === str.charAt(0)) {
+                str = str.substring(1);
+            }
+            if(character === str.charAt(str.length - 1)) {
+                str = str.substring(0, str.length - 1);
+            }
+            
+            return str;
+        },
+        ucFirst: function(str) {
+            var ret = str.charAt(0).toUpperCase();
+            
+            return ret + str.substring(1);
+        },
+        filterTags: function(str, allowed) {
+            var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
+            var comments = /<!--[\s\S]*?-->/gi;
+            
+            str = str.replace(comments, '');
+            
+            if(undefined === allowed) {
+                return str.replace(tags, '');
+            }
+            
+            allowed = allowed.toLowerCase();
+            
+            return str.replace(tags, function(match, p) {
+                return allowed.indexOf('<' + p.toLowerCase() + '>') !== -1 ? match : '';
+            });
+        }
+    },
+    dom: {
+        addClass: function(element, className) {
+            if(-1 !== element.className.indexOf(className)) {
+                return;
+            }
+            
+            element.className = element.className + ' ' + className;
+        },
+        removeClass: function(element, className) {
+            var newClassName =  ' ' + element.className + ' ';
+            var replaced = newClassName.replace(' ' + className + ' ', ' ');
+            
+            element.className = XEditor.tools.string.trimChar(replaced, ' ');
+        },
+        preventDefault: function(event) {
+            if(event.preventDefault) {
+                event.preventDefault();
+            
+            } else {
+                event.returnValue = false;
+            }
+        },
+        setStyle: function(element, styles) {
+            for(var s in styles) {
+                element.style[s] = styles[s];
+            }
+        },
+        getOffset: function(elem) {
+            if ( !elem.getClientRects().length ) {
+                return { top: 0, left: 0 };
+            }
+        
+            var rect = elem.getBoundingClientRect();
+            var doc = elem.ownerDocument;
+            var docElem = doc.documentElement;
+            var win = doc.defaultView;
+
+            return {
+                top: rect.top + win.pageYOffset - docElem.clientTop,
+                left: rect.left + win.pageXOffset - docElem.clientLeft
+            };
+        }
+    }
+};
+
 
 /**
  * Dialog
@@ -905,3 +968,4 @@ XEditor.Dialog.prototype = {
         this.resetPosition();
     }
 };
+

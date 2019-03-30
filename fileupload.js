@@ -180,7 +180,9 @@ XFileUpload.prototype = {
             return;
         }
         
-        this.filesQueue = new XFileUpload.Queue();
+        if(null === this.filesQueue) {
+            this.filesQueue = new XFileUpload.Queue();
+        }
         
         var i = 0;
         var len = fileList.length;
@@ -257,6 +259,7 @@ XFileUpload.prototype = {
         var file = this.filesQueue.take();
         
         if(null === file) {
+            this.filesQueue = null;
             this.fileInput.value = '';
             
             this.fireEvent('uploadComplete');

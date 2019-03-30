@@ -19,12 +19,12 @@ XEditorBold.prototype = {
             return;
         }
         
-        editor.execCommand('bold', false, null);
+        XEditor.editing.execCommand('bold', false, null);
         
         this.statusReflect(editor);
     },
     statusReflect: function(editor) {
-        var ret = editor.queryCommandState('bold');
+        var ret = XEditor.editing.queryCommandState('bold');
         if(true === ret) {
             XEditor.tools.dom.addClass(this.button, 'active');
             
@@ -93,7 +93,7 @@ XEditorEmotion.prototype = {
             var em = target.getAttribute('data-em');
             
             if(null !== em) {
-                _self.editor.execCommand('insertHTML', false, em);
+                XEditor.editing.execCommand('insertHTML', false, em);
                 
                 _self.close();
             }
@@ -210,7 +210,7 @@ XEditorLink.prototype = {
                         originA.innerHTML = (text || link);
                         
                     } else {
-                        _self.editor.execCommand('insertHTML', false,
+                        XEditor.editing.execCommand('insertHTML', false,
                             '<a href="'+ link +'">'+ (text || link) +'</a>');
                         XEditor.editing.saveCurrentRange();
                     }
@@ -381,7 +381,7 @@ XEditorImage.prototype = {
                 
                 if('' !== ret) {
                     ret += '<p><br></p>';
-                    _self.editor.execCommand('insertHTML', false, ret);
+                    XEditor.editing.execCommand('insertHTML', false, ret);
                 }
                 
                 _self.close();
@@ -558,12 +558,12 @@ XEditorItalic.prototype = {
         if(range.collapsed) {
             return;
         }
-        editor.execCommand('italic', false, null);
+        XEditor.editing.execCommand('italic', false, null);
         
         this.statusReflect(editor);
     },
     statusReflect: function(editor) {
-        var ret = editor.queryCommandState('italic');
+        var ret = XEditor.editing.queryCommandState('italic');
         if(true === ret) {
             XEditor.tools.dom.addClass(this.button, 'active');
             
