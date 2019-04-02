@@ -65,7 +65,7 @@ function XEditor(options) {
     /**
      * 内容为空时的默认 html
      */
-    this.emptyContent = '<p><br></p>';
+    this.emptyContent = '<p><br /></p>';
     
     /**
      * 配置
@@ -230,7 +230,7 @@ XEditor.prototype = {
         
         this.widgetsStatusReflect();
         
-        this.fire('focus', null);
+        this.fire('contentFocus', null);
     },
     widgetsStatusReflect: function() {
         for(var widget in this.widgetControllerInstances) {
