@@ -212,7 +212,7 @@ XEditorLink.prototype = {
                     } else {
                         XEditor.editing.execCommand('insertHTML', false,
                             '<a href="'+ link +'">'+ (text || link) +'</a>');
-                        XEditor.editing.saveCurrentRange();
+                        XEditor.editing.backupCurrentRange();
                     }
                     
                     _self.close();
@@ -732,13 +732,9 @@ XEditorSeparator.prototype = {
             
             var action = target.getAttribute('data-action');
             
-            // 先插入一个空行
-            XEditor.editing.execCommand('insertHTML', false,
-                '<p><br /></p>');
-            
             if('solid' === action) {
                 XEditor.editing.execCommand('insertHTML', false,
-                '<figure><hr /></figure>');
+                '<figure><hr /></figure><p><br /></p>');
             }
             
             // 光标移动末尾
