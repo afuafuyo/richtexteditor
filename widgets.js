@@ -8,7 +8,7 @@ function XEditorBold(button, editor) {
 XEditorBold.prototype = {
     constructor: XEditorBold,
     onClick: function(editor) {
-        var range = XEditor.editing.currentRange;
+        var range = XEditor.editable.getCurrentRange();
         
         if(null === range) {
             return;
@@ -19,12 +19,12 @@ XEditorBold.prototype = {
             return;
         }
         
-        XEditor.editing.execCommand('bold', false, null);
+        XEditor.editable.execCommand('bold', false, null);
         
         this.statusReflect(editor);
     },
     statusReflect: function(editor) {
-        var ret = XEditor.editing.queryCommandState('bold');
+        var ret = XEditor.editable.queryCommandState('bold');
         if(true === ret) {
             XEditor.tools.dom.addClass(this.button, 'active');
             
@@ -93,7 +93,7 @@ XEditorEmotion.prototype = {
             var em = target.getAttribute('data-em');
             
             if(null !== em) {
-                XEditor.editing.execCommand('insertHTML', false, em);
+                XEditor.editable.insertHtml(XEditor.editable.TYPE_TEXT, em);
                 
                 _self.close();
             }
@@ -146,7 +146,7 @@ function XEditorLink(button, editor) {
 XEditorLink.prototype = {
     constructor: XEditorLink,
     getLinkElement: function() {
-        var range = XEditor.editing.currentRange;
+        var range = XEditor.editable.getCurrentRange();
         
         if(null === range) {
             return null;
@@ -210,9 +210,8 @@ XEditorLink.prototype = {
                         originA.innerHTML = (text || link);
                         
                     } else {
-                        XEditor.editing.execCommand('insertHTML', false,
+                        XEditor.editable.insertHtml(XEditor.editable.TYPE_HTML,
                             '<a href="'+ link +'">'+ (text || link) +'</a>');
-                        XEditor.editing.backupCurrentRange();
                     }
                     
                     _self.close();
@@ -252,7 +251,7 @@ XEditorLink.prototype = {
         this.autoFocus();
     },
     statusReflect: function(editor) {
-        var range = XEditor.editing.currentRange;
+        var range = XEditor.editable.getCurrentRange();
         
         if(null === range) {
             return;
@@ -381,7 +380,7 @@ XEditorImage.prototype = {
                 
                 if('' !== ret) {
                     ret += '<p><br></p>';
-                    XEditor.editing.execCommand('insertHTML', false, ret);
+                    XEditor.editable.insertHtml(XEditor.editable.TYPE_HTML, ret);
                 }
                 
                 _self.close();
@@ -494,7 +493,7 @@ function XEditorBlockQuote(button) {
 XEditorBlockQuote.prototype = {
     constructor: XEditorBlockQuote,
     onClick: function(editor) {
-        var range = XEditor.editing.currentRange;
+        var range = XEditor.editable.getCurrentRange();
 
         if(null === range) {
             return;
@@ -517,12 +516,12 @@ XEditorBlockQuote.prototype = {
         
         container.parentNode.replaceChild(node, container);
         
-        XEditor.editing.resetRangeAt(node, true);
+        XEditor.editable.resetRangeAt(node, true);
         
         this.statusReflect(editor);
     },
     statusReflect: function(editor) {
-        var range = XEditor.editing.currentRange;
+        var range = XEditor.editable.getCurrentRange();
         
         if(null === range) {
             return;
@@ -549,7 +548,7 @@ function XEditorItalic(button) {
 XEditorItalic.prototype = {
     constructor: XEditorItalic,
     onClick: function(editor) {
-        var range = XEditor.editing.currentRange;
+        var range = XEditor.editable.getCurrentRange();
 
         if(null === range) {
             return;
@@ -558,12 +557,12 @@ XEditorItalic.prototype = {
         if(range.collapsed) {
             return;
         }
-        XEditor.editing.execCommand('italic', false, null);
+        XEditor.editable.execCommand('italic', false, null);
         
         this.statusReflect(editor);
     },
     statusReflect: function(editor) {
-        var ret = XEditor.editing.queryCommandState('italic');
+        var ret = XEditor.editable.queryCommandState('italic');
         if(true === ret) {
             XEditor.tools.dom.addClass(this.button, 'active');
             
@@ -584,7 +583,7 @@ function XEditorCode(button) {
 XEditorCode.prototype = {
     constructor: XEditorCode,
     onClick: function(editor) {
-        var range = XEditor.editing.currentRange;
+        var range = XEditor.editable.getCurrentRange();
 
         if(null === range) {
             return;
@@ -603,12 +602,12 @@ XEditorCode.prototype = {
         node.innerHTML = container.innerHTML;
         container.parentNode.replaceChild(node, container);
         
-        XEditor.editing.resetRangeAt(node, true);
+        XEditor.editable.resetRangeAt(node, true);
         
         this.statusReflect(editor);
     },
     statusReflect: function(editor) {
-        var range = XEditor.editing.currentRange;
+        var range = XEditor.editable.getCurrentRange();
         
         if(null === range) {
             return;
@@ -662,7 +661,7 @@ XEditorAlign.prototype = {
         
         this.dropWrapper.onclick = function(e) {
             var target = e.target;
-            var range = XEditor.editing.currentRange;
+            var range = XEditor.editable.getCurrentRange();
             
             if(null === range) {
                 return;
@@ -721,7 +720,7 @@ XEditorSeparator.prototype = {
         
         this.dropWrapper.onclick = function(e) {
             var target = e.target;
-            var range = XEditor.editing.currentRange;
+            var range = XEditor.editable.getCurrentRange();
             
             if(null === range) {
                 return;
@@ -733,12 +732,9 @@ XEditorSeparator.prototype = {
             var action = target.getAttribute('data-action');
             
             if('solid' === action) {
-                XEditor.editing.execCommand('insertHTML', false,
+                XEditor.editable.insertHtml(XEditor.editable.TYPE_HTML,
                 '<figure><hr /></figure><p><br /></p>');
             }
-            
-            // 光标移动末尾
-            _self.editor.resetRangeAtEndElement(true);
         };
     },
     onClick: function(editor) {},

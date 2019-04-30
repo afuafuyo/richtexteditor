@@ -207,7 +207,7 @@ XEditor.prototype = {
             this.setContent('');
         }
         
-        XEditor.editing.backupCurrentRange();
+        XEditor.editable.backupCurrentRange();
         
         this.widgetsStatusReflect();
         
@@ -219,14 +219,14 @@ XEditor.prototype = {
         
         clearTimeout(this.reactionTimer);
         this.reactionTimer = setTimeout(function(){
-            XEditor.editing.backupCurrentRange();
+            XEditor.editable.backupCurrentRange();
             
             _self.widgetsStatusReflect();
             
         }, this.configs.reactionTime);
         */
         
-        XEditor.editing.backupCurrentRange();
+        XEditor.editable.backupCurrentRange();
         
         this.widgetsStatusReflect();
         
@@ -297,7 +297,7 @@ XEditor.prototype = {
             toEnd = false;
         }
         
-        XEditor.editing.resetRangeAt(this.root.lastChild, toEnd);
+        XEditor.editable.resetRangeAt(this.root.lastChild, toEnd);
     },
     
     /**
@@ -524,18 +524,16 @@ XEditor.registerWidgetController = function(name, processer) {
 XEditor.Range = function(nativeRange) {
     this.nativeRange = nativeRange;
     
-    this.init(nativeRange);
+    this.collapsed = nativeRange.collapsed;
+    this.startContainer = nativeRange.startContainer;
+    this.endContainer = nativeRange.endContainer;
+    this.startOffset = nativeRange.startOffset;
+    this.endOffset = nativeRange.endOffset;
+    this.commonAncestorContainer  = nativeRange.commonAncestorContainer;
 };
 XEditor.Range.prototype = {
-    constructor: XEditor.Range,
-    init: function(nativeRange) {
-        this.collapsed = nativeRange.collapsed;
-        this.startContainer = nativeRange.startContainer;
-        this.endContainer = nativeRange.endContainer;
-        this.startOffset = nativeRange.startOffset;
-        this.endOffset = nativeRange.endOffset;
-        this.commonAncestorContainer  = nativeRange.commonAncestorContainer;
-    },
+    constructor: XEditor.Range
+    
     /**
      * 获取距离选区最近的标签元素
      *
@@ -546,15 +544,24 @@ XEditor.Range.prototype = {
      *      </p>
      * </div>
      */
-    getClosestContainerElement: function() {
+    ,getClosestContainerElement: function() {
         var node = this.commonAncestorContainer;
         
         return 1 === node.nodeType ? node : node.parentNode;
-    },
+    }
+    
     /**
      * 获取距离可编辑容器最近的最外层元素
+     *
+     * 光标在 b 会得到 p 元素
+     * <div contenteditable="true">
+     *      <p>
+     *          <b>aabb|ccdd</b>
+     *      </p>
+     * </div>
+     *
      */
-    getOutermostElement: function() {
+    ,getOutermostElement: function() {
         var role = 'xeditor-root';
         
         var node = this.commonAncestorContainer;
@@ -572,13 +579,14 @@ XEditor.Range.prototype = {
         }
         
         return node;
-    },
+    }
+    
     /**
      * 当前选区是否在某个元素中
      *
      * @param {String} nodeName 小写标签名
      */
-    currentInNode: function(nodeName) {
+    ,currentInNode: function(nodeName) {
         var ret = false;
         var role = 'xeditor-root';
         var node = this.commonAncestorContainer;
@@ -606,44 +614,35 @@ XEditor.Range.prototype = {
         }
         
         return ret;
-    },
+    }
     
-    setStart: function(startNode, startOffset) {
+    /* ,setStart: function(startNode, startOffset) {
         this.nativeRange.setStart(startNode, startOffset);
         
-        // 更改属性
-        /*
         this.startContainer = startNode;
         this.startOffset = startOffset;
-        */
-        this.init(this.nativeRange);
-    },
-    setEnd: function(endNode, endOffset) {
+    } */
+    
+    /* ,setEnd: function(endNode, endOffset) {
         this.nativeRange.setEnd(endNode, endOffset);
         
-        /*
         this.endContainer = endNode;
         this.endOffset = endOffset;
-        */
-        this.init(this.nativeRange);
-    },
-    insertNode: function(newNode) {
+    } */
+    
+    /* ,insertNode: function(newNode) {
         this.nativeRange.insertNode(newNode);
-        
-        this.init(this.nativeRange);
-    },
-    collapse: function(toStart) {
+    } */
+    
+    /* ,collapse: function(toStart) {
         this.nativeRange.collapse(toStart);
         
-        /*
         this.collapsed = true;
-        */
-        this.init(this.nativeRange);
-    },
-    selectNode: function(referenceNode) {
+    } */
+    
+    /* ,selectNode: function(referenceNode) {
         this.nativeRange.selectNode(referenceNode);
         
-        /*
         // 选中节点 属性会变更
         this.collapsed = false;
         this.startContainer = referenceNode.parentNode;
@@ -658,13 +657,11 @@ XEditor.Range.prototype = {
         }
         this.startOffset = i;
         this.endOffset = i + 1;
-        */
-        this.init(this.nativeRange);
-    },
-    selectNodeContents: function(referenceNode) {
+    } */
+    
+    /* ,selectNodeContents: function(referenceNode) {
         this.nativeRange.selectNodeContents(referenceNode);
         
-        /*
         this.collapsed = false;
         this.startContainer = referenceNode;
         this.endContainer = referenceNode;
@@ -683,14 +680,11 @@ XEditor.Range.prototype = {
         } else {
             this.endOffset = referenceNode.childNodes.length;
         }
-        */
-        this.init(this.nativeRange);
-    },
-    deleteContents: function() {
+    } */
+    
+    /* ,deleteContents: function() {
         this.nativeRange.deleteContents();
-        
-        this.init(this.nativeRange);
-    }
+    } */
 };
 XEditor.Range.getSingleRangeFromNativeSelection = function() {
     var selection = null;
@@ -724,148 +718,141 @@ XEditor.Range.getSelectionFromNative = function() {
 /**
  * 对外 API - Selection & Range & execCommand
  */
-XEditor.editing = {
-    // 记录光标位置
-    currentRange: null,
-    /**
-     * 备份当前 range
-     *
-     * @param {Range} range
-     */
-    backupCurrentRange: function(range) {
-        if(undefined !== range) {
-            XEditor.editing.currentRange = range;
-            
-            return;
-        }
+XEditor.editable = function() {};
+XEditor.editable.TYPE_HTML = 1;
+XEditor.editable.TYPE_TEXT = 2;
+// 记录光标位置
+XEditor.editable._currentRange = null;
+XEditor.editable.getCurrentRange = function() {
+    return XEditor.editable._currentRange;
+};
+/**
+ * 备份当前 range
+ *
+ * @param {XEditor.Range} range
+ */
+XEditor.editable.backupCurrentRange = function(range) {
+    if(undefined !== range) {
+        XEditor.editable._currentRange = range;
         
-        var getRange = XEditor.Range.getSingleRangeFromNativeSelection();
-        
-        if(null !== getRange) {
-            XEditor.editing.currentRange = getRange;
-        }
-    },
-    /**
-     * 设置 range 到某个节点
-     *
-     * @param {Node} node
-     * @param {Boolean} toEnd 默认为 false
-     */
-    resetRangeAt: function(node, toEnd) {
-        var range = XEditor.Range.createNativeRange();
-        
-        if(null === range) {
-            return;
-        }
-        
-        if(true === toEnd) {
-            // If the nodeType of node is one of Text, Comment, or CDATASection
-            // then the offset is the number of characters contained in the node.
-            // Others offset is the number of child nodes.
-            var position = (3 === node.nodeType || 4 === node.nodeType || 8 === node.nodeType)
-                ? node.nodeValue.length
-                : node.childNodes.length;
-            range.setStart(node, position);
-            
-        } else {
-            range.setStart(node, 0);
-        }
-        
-        // range.insertNode(document.createTextNode('|'));
-        
-        XEditor.editing.backupCurrentRange(new XEditor.Range(range));
-        XEditor.editing.resumeSelection();
-    },
-    /**
-     * 重新设置 selection 中的 range
-     */
-    resumeSelection: function() {
-        if(null === XEditor.editing.currentRange) {
-            return;
-        }
-        
-        var selection = XEditor.Range.getSelectionFromNative();
-        
-        if(null === selection) {
-            return;
-        }
-        
-        if(selection.rangeCount > 0) {
-            selection.removeAllRanges();
-        }
-        
-        selection.addRange(XEditor.editing.currentRange.nativeRange);
-    },
-    diffApi: {
-        insertHTML: function(aShowDefaultUI, aValueArgument) {
-            var doc = document;
-            
-            if(doc.queryCommandSupported('insertHTML')) {
-                //doc.execCommand('insertHTML', aShowDefaultUI, aValueArgument);
-            
-                //return;
-            }
-            
-            
-            // other browser
-            var range = XEditor.editing.currentRange;
-            if(null === range) {
-                return;
-            }
-            
-            // 如果插入的片段开头是块级元素 那么需要将其作为可编辑元素的直接子元素
-            var match = aValueArgument.match(/^<(\w+)[^>]*/);
-            var ele = null;
-            
-            // block level element
-            if(null !== match && 1 === XEditor.blockLevelElements[ match[1].toLowerCase() ]) {
-                ele = range.getOutermostElement();
-                
-                var tmp = doc.createElement('div');
-                tmp.innerHTML = aValueArgument;
-                
-                if(null === ele.nextSibling) {
-                    for(var i=0, len=tmp.childNodes.length, p=ele.parentNode; i<len; i++) {
-                        console.log(tmp.childNodes[i])
-                        p.appendChild(tmp.childNodes[i]);
-                    }
-                    
-                } else {
-                    
-                }
-                
-                return;
-            }
-            
-            // inline block level element
-            range.deleteContents();
-            range.collapse(false);
-            
-            ele = range.getClosestContainerElement();
-            var text = ele.innerHTML;
-            
-            ele.innerHTML = text.substring(0, range.startOffset)
-                + aValueArgument
-                + text.substring(range.startOffset);
-        }
-    },
-    // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
-    execCommand: function(aCommandName, aShowDefaultUI, aValueArgument) {
-        // 执行命令前 需要知道光标的位置
-        XEditor.editing.resumeSelection();
-        
-        if(undefined !== XEditor.editing.diffApi[aCommandName]) {
-            XEditor.editing.diffApi[aCommandName](
-                aShowDefaultUI, aValueArgument);
-            
-            return;
-        }
-        
-        document.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
-    },
-    queryCommandState: function(command) {
-        return document.queryCommandState(command);
+        return;
     }
+    
+    var gettedRange = XEditor.Range.getSingleRangeFromNativeSelection();
+    
+    if(null !== gettedRange) {
+        XEditor.editable._currentRange = gettedRange;
+    }
+};
+/**
+ * 重新设置 selection 中的 range
+ */
+XEditor.editable.resumeSelection = function() {
+    if(null === XEditor.editable._currentRange) {
+        return;
+    }
+    
+    var selection = XEditor.Range.getSelectionFromNative();
+    
+    if(null === selection) {
+        return;
+    }
+    
+    if(selection.rangeCount > 0) {
+        selection.removeAllRanges();
+    }
+    
+    selection.addRange(XEditor.editable._currentRange.nativeRange);
+};
+/**
+ * 设置 range 到某个节点
+ *
+ * @param {Node} node
+ * @param {Boolean} toEnd 默认为 false
+ */
+XEditor.editable.resetRangeAt = function(node, toEnd) {
+    var range = XEditor.Range.createNativeRange();
+
+    if(null === range) {
+        return;
+    }
+
+    if(true === toEnd) {
+        // If the nodeType of node is one of Text, Comment, or CDATASection
+        // then the offset is the number of characters contained in the node.
+        // Others offset is the number of child nodes.
+        var position = (3 === node.nodeType || 4 === node.nodeType || 8 === node.nodeType)
+            ? node.nodeValue.length
+            : node.childNodes.length;
+        range.setStart(node, position);
+        range.setEnd(node, position);
+        
+    } else {
+        range.setStart(node, 0);
+        range.setEnd(node, 0);
+    }
+
+    XEditor.editable.backupCurrentRange(new XEditor.Range(range));
+    XEditor.editable.resumeSelection();
+};
+/**
+ * 插入内容
+ */
+XEditor.editable.insertHtml = function(type, data) {
+    var range = XEditor.editable._currentRange;
+    if(null === range) {
+        return;
+    }
+    
+    // 执行命令前 需要知道光标的位置
+    XEditor.editable.resumeSelection();
+    
+    var doc = document;
+    var fragement = null;
+    
+    // 插入文本
+    if(XEditor.editable.TYPE_TEXT === type) {
+        fragement = doc.createTextNode(data);
+        
+        range.nativeRange.insertNode(fragement);
+        range.nativeRange.collapse(false);
+        
+        XEditor.editable.backupCurrentRange();
+        return;
+    }
+    
+    // html
+    fragement = doc.createElement('div');
+    fragement.innerHTML = data;
+    
+    // 如果插入的是块级元素 那么需要将其作为可编辑元素的直接子元素
+    var match = data.match(/^<(\w+)[^>]*/);
+    var ele = null;
+    
+    // block level element
+    if(null !== match && 1 === XEditor.blockLevelElements[ match[1].toLowerCase() ]) {
+        ele = range.getOutermostElement();
+        range.nativeRange.setStartAfter(ele);
+    }
+    
+    // inline block level element
+    while(fragement.childNodes.length > 0) {
+        range.nativeRange.insertNode(fragement.firstChild);
+        
+        range.nativeRange.collapse(false);
+    }
+    
+    XEditor.editable.backupCurrentRange();
+};
+// https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
+XEditor.editable.execCommand = function(aCommandName, aShowDefaultUI, aValueArgument) {
+    // 执行命令前 需要知道光标的位置
+    XEditor.editable.resumeSelection();
+        
+    document.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
+};
+XEditor.editable.queryCommandState = function(command) {
+    return document.queryCommandState(command);
 };
 
 
