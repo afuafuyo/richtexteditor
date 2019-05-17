@@ -733,7 +733,7 @@ XEditorSeparator.prototype = {
             
             if('solid' === action) {
                 XEditor.editable.insertHtml(XEditor.editable.TYPE_HTML,
-                '<figure><hr /></figure><p><br /></p>');
+                '<hr /><p><br /></p>');
             }
         };
     },

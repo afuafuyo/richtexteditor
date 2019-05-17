@@ -466,47 +466,6 @@ XEditor.prototype = {
 
 
 /**
- * 块级元素
- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements
- */
-XEditor.blockLevelElements = {
-    address: 1,
-    fieldset: 1,
-    article: 1,
-    figcaption: 1,
-    main: 1,
-    aside: 1,
-    figure: 1,
-    nav: 1,
-    blockquote: 1,
-    footer: 1,
-    ol: 1,
-    ul: 1,
-    li: 1,
-    details: 1,
-    form: 1,
-    p: 1,
-    dialog: 1,
-    pre: 1,
-    h1: 1,
-    h2: 1,
-    h3: 1,
-    h4: 1,
-    h5: 1,
-    h6: 1,
-    dd: 1,
-    dl: 1,
-    dt: 1,
-    header: 1,
-    section: 1,
-    div: 1,
-    hgroup: 1,
-    table: 1,
-    hr: 1
-};
-
-
-/**
  * 具有 UI 的部件
  *
  * {name: Function ...}
@@ -566,10 +525,11 @@ XEditor.Range.prototype = {
         
         var node = this.commonAncestorContainer;
         
-        // 文本或者选区 直接在可编辑容器下面 这个情况很少
+        // 文本直接在可编辑容器下面
         if(3 === node.nodeType && role === node.parentNode.getAttribute('data-role')) {
             return null;
         }
+        // 选区直接在可编辑容器下面
         if(1 === node.nodeType && role === node.getAttribute('data-role')) {
             return null;
         }
@@ -591,10 +551,11 @@ XEditor.Range.prototype = {
         var role = 'xeditor-root';
         var node = this.commonAncestorContainer;
         
-        // 文本或者选区 直接在可编辑容器下面 这个情况很少
+        // 文本直接在可编辑容器下面
         if(3 === node.nodeType && role === node.parentNode.getAttribute('data-role')) {
             return false;
         }
+        // 选区直接在可编辑容器下面
         if(1 === node.nodeType && role === node.getAttribute('data-role')) {
             return false;
         }
@@ -727,6 +688,45 @@ XEditor.editable.getCurrentRange = function() {
     return XEditor.editable._currentRange;
 };
 /**
+ * 块级元素
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements
+ */
+XEditor.editable.blockLevelElements = {
+    address: 1,
+    fieldset: 1,
+    article: 1,
+    figcaption: 1,
+    main: 1,
+    aside: 1,
+    figure: 1,
+    nav: 1,
+    blockquote: 1,
+    footer: 1,
+    ol: 1,
+    ul: 1,
+    li: 1,
+    details: 1,
+    form: 1,
+    p: 1,
+    dialog: 1,
+    pre: 1,
+    h1: 1,
+    h2: 1,
+    h3: 1,
+    h4: 1,
+    h5: 1,
+    h6: 1,
+    dd: 1,
+    dl: 1,
+    dt: 1,
+    header: 1,
+    section: 1,
+    div: 1,
+    hgroup: 1,
+    table: 1,
+    hr: 1
+};
+/**
  * 备份当前 range
  *
  * @param {XEditor.Range} range
@@ -822,6 +822,7 @@ XEditor.editable.insertHtml = function(type, data) {
     }
     
     // html
+    data = data.replace(/^\s*/, '').replace(/\s*$/, '');
     fragement = doc.createElement('div');
     fragement.innerHTML = data;
     
@@ -830,8 +831,13 @@ XEditor.editable.insertHtml = function(type, data) {
     var ele = null;
     
     // block level element
-    if(null !== match && 1 === XEditor.blockLevelElements[ match[1].toLowerCase() ]) {
+    if(null !== match && 1 === XEditor.editable.blockLevelElements[ match[1].toLowerCase() ]) {
         ele = range.getOutermostElement();
+        
+        if(null === ele) {
+            ele = range.nativeRange.commonAncestorContainer.childNodes[range.nativeRange.endOffset - 1];
+        }
+        
         range.nativeRange.setStartAfter(ele);
     }
     
