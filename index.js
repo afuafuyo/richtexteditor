@@ -304,7 +304,10 @@ XEditor.prototype = {
      * 获取内容
      */
     getContent: function() {
-        return this.root.innerHTML.replace(/&#8203;/g, '');
+        var tmp = this.root.innerHTML;
+        
+        // 去除多余空白
+        return tmp.replace(/&#8203;/g, '').replace(/<br\s*\/?><\/p>/g, '</p>');
     },
     
     /**
