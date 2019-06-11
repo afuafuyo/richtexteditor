@@ -307,7 +307,7 @@ XEditor.prototype = {
         var tmp = this.root.innerHTML;
         
         // 去除多余空白
-        return tmp.replace(/&#8203;/g, '').replace(/<br\s*\/?><\/p>/g, '</p>');
+        return tmp.replace(/&#8203;/g, '');
     },
     
     /**
