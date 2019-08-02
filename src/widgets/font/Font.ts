@@ -133,6 +133,8 @@ class Font extends IWidget {
             default:
                 break;
         }
+
+        this.editor.fire('selectionchange');
     }
 
     /**
@@ -146,6 +148,28 @@ class Font extends IWidget {
     /**
      * @inheritdoc
      */
-    statusReflect() {}
+    statusReflect() {
+        let range = Editable.getCurrentRange();
+        if(null === range) {
+            return;
+        }
+
+        let font = '';
+        if(range.currentInNode('h1')) {
+            font = 'h1';
+
+        } else if(range.currentInNode('h2')) {
+            font = 'h2';
+        }
+
+        this.nowFont = font;
+
+        if('' === font) {
+            Tools.removeClass(this.button, 'active');
+
+        } else {
+            Tools.addClass(this.button, 'active');
+        }
+    }
 }
 Editor.registerWidgetController('font', Font);
