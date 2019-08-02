@@ -9,7 +9,8 @@
  *
  * eg.
  *
- * var up = new XFileUpload('elementId', {
+ * var up = new XFileUpload({
+ *      id: 'inputComponentId',
  *      server: '/api/upload',
  *      fieldName: 'file'
  * });
@@ -37,10 +38,9 @@
  * }
  *
  */
-var XFileUpload = function(id, options) {
+var XFileUpload = function(options) {
     this.doc = document;
     this.fileInput = null;
-    this.id = id;
     
     this.xhr = new XMLHttpRequest();
     
@@ -63,6 +63,7 @@ var XFileUpload = function(id, options) {
     this.uploadCompleteHandler = null;
     
     this.configs = {
+        id: '',
         postParams: {}
         ,headers: {}
         ,server: ''
@@ -76,7 +77,8 @@ var XFileUpload = function(id, options) {
         ,fileSizeLimit: 1024 * 1024  // 1Mb
     };
     
-    this.init(options);
+    this.initOptions(options);
+    this.initInputComponent();
 };
 XFileUpload.prototype = {
     constructor: XFileUpload,
@@ -139,28 +141,38 @@ XFileUpload.prototype = {
             this.xhr.setRequestHeader(k, this.configs.headers[k]);
         }
     },
-    init: function(options) {
+    clearFileInput: function() {
+        if(null !== this.fileInput) {
+            this.fileInput.value = '';
+        }
+    },
+    initOptions: function(options) {
         var _self = this;
         
         if(undefined !== options) {
             this.extend(this.configs, options);
         }
         
-        this.fileInput = this.doc.getElementById(this.id);
+        // 自动上传
+        this.filesQueuedCompleteHandler = function(obj) {
+            if(_self.configs.auto) {
+                _self.startUpload();
+            }
+        };
+    },
+    initInputComponent: function() {
+        if('' === this.configs.id) {
+            return;
+        }
+        
+        this.fileInput = this.doc.getElementById(this.configs.id);
         this.fileInput.setAttribute('accept', this.configs.accept);
         if(this.configs.multiple) {
             this.fileInput.setAttribute('multiple', 'multiple');
         }
     
         this.fileInput.onchange = function(e) {
-            _self.selectFiles();
-        };
-        
-        // 自动上传
-        this.filesQueuedCompleteHandler = function(obj) {
-            if(_self.configs.auto) {
-                _self.startUpload();
-            }
+            _self.selectFiles(e.target.files);
         };
     },
     isValidFile: function(file) {
@@ -174,8 +186,7 @@ XFileUpload.prototype = {
         
         return true;
     },
-    selectFiles: function() {
-        var fileList = this.fileInput.files;
+    selectFiles: function(fileList) {
         if(fileList.length <= 0) {
             return;
         }
@@ -260,7 +271,7 @@ XFileUpload.prototype = {
         
         if(null === file) {
             this.filesQueue = null;
-            this.fileInput.value = '';
+            this.clearFileInput();
             
             this.fireEvent('uploadComplete');
             
@@ -324,12 +335,12 @@ XFileUpload.Queue.prototype.clear = function() {
     }
 };
 XFileUpload.Queue.prototype.toArray = function() {
-    var ret = new Array(this.size);
+    var ret = [];
     
     var i = 0;
     var current = null;
     for(current = this.headNode; null !== current; current = current.next) {
-        ret[i] = current.data;
+        ret.push(current.data);
         i++;
     }
     

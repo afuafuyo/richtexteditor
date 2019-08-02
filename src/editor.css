@@ -1,41 +1,26 @@
 /**
- * reset
- */
-figure {
-    margin: 0;
-    padding: 0;
-    text-align: center;
-}
-figure img {
-    max-width: 100%;
-}
-figure img:hover {
-    box-shadow: 0 0 0 2px #37C8F7;
-}
-figure figcaption {
-    min-width: 100px;
-    max-width: 80%;
-    line-height: 1.5;
-    margin: 0 auto;
-    padding: 10px 0;
-    color: #999;
-    font-size: 14px;
-    cursor: text;
-    outline: none;
-    border-bottom: 1px solid #e4e6e8;
-}
-figure figcaption:empty::after {
-    content: '输入图片注释';
-    color: #f1f2f3;
-}
-figure figcaption:focus::after {
-    content: '';
-}
-
-/**
  * util
  */
-.xeditor-dialog-close {
+.xeditor-pop-wrapper {
+    position: absolute;
+    top: 36px;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 0px 2px 0px #ccd0d7;
+    display: none;
+}
+.xeditor-pop-wrapper:before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 7px;
+    width: 16px;
+    height: 8px;
+    background: url(./icons/icon-all.png) no-repeat -50px -83px;
+}
+.xeditor-pop-close {
     position: absolute;
     top: 10px;
     right: 6px;
@@ -44,14 +29,14 @@ figure figcaption:focus::after {
     cursor: pointer;
     background: url(./icons/icon-all.png) no-repeat -50px -10px;
 }
-.xeditor-dialog-close:hover {
+.xeditor-pop-close:hover {
     background-position: -50px -30px;
 }
-.xeditor-dialog-tabs {
+.xeditor-pop-tabs {
     height: 40px;
     border-bottom: 1px solid #ccc;
 }
-.xeditor-dialog-tabs a {
+.xeditor-pop-tabs a {
     display: inline-block;
     line-height: 40px;
     font-size: 14px;
@@ -59,8 +44,8 @@ figure figcaption:focus::after {
     padding: 0 12px;
     text-decoration: none;
 }
-.xeditor-dialog-tabs a:hover,
-.xeditor-dialog-tabs a.active {
+.xeditor-pop-tabs a:hover,
+.xeditor-pop-tabs a.active {
     color: #00a1d6;
     border-bottom: 1px solid #00a1d6;
 }
@@ -87,7 +72,7 @@ figure figcaption:focus::after {
     background-color: #00a1d6;
     border-color: #00a1d6;
 }
-.xeditor-dialog-footer {
+.xeditor-pop-footer {
     padding: 8px 10px 8px 10px;
     text-align: right;
 }
@@ -108,48 +93,17 @@ figure figcaption:focus::after {
     border: 0;
     outline: none;
 }
-.xeditor-dropdown-wrapper {
-    position: absolute;
-    top: 30px;
-    left: 0;
-    padding: 10px 0;
-    background-color: #f1f2f3;
-    display: none;
-    box-shadow: 0 2px 4px 0 #ccd0d7;
-    border-bottom-right-radius: 2px;
-    border-bottom-left-radius: 2px;
-}
-.xeditor-pop-wrapper {
-    position: absolute;
-    top: 36px;
-    left: 0;
-    min-width: 200px;
-    min-height: 100px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 0px 2px 0px #ccd0d7;
-    display: none;
-}
-.xeditor-pop-wrapper:before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 7px;
-    width: 16px;
-    height: 8px;
-    background: url(./icons/icon-all.png) no-repeat -50px -83px;
-}
 
 
 /**
- * begining
+ * main
  */
 .xeditor-wrapper {
     border-bottom: 1px solid #e7eaf1;
 }
 .xeditor-widgets-wrapper {
-    padding: 3px 0;
+    position: relative;
+    padding: 5px 0;
     background-color: #fff;
     border-top: 1px solid #e7eaf1;
     border-bottom: 1px solid #e7eaf1;
@@ -171,6 +125,16 @@ figure figcaption:focus::after {
     outline: none;
     overflow: auto;
 }
+.xeditor-wrapper h1,
+.xeditor-wrapper h2,
+.xeditor-wrapper h3,
+.xeditor-wrapper h4,
+.xeditor-wrapper h5,
+.xeditor-wrapper h6,
+.xeditor-wrapper p {
+    margin: 0;
+    padding: 0;
+}
 
 
 /**
@@ -180,7 +144,7 @@ figure figcaption:focus::after {
     display: inline-block;
     width: 30px;
     height: 30px;
-    margin: 0 6px;
+    margin: 0 5px;
     background-image: url(./icons/icon-all.png);
     background-repeat: no-repeat;
     background-color: transparent;
@@ -195,6 +159,9 @@ figure figcaption:focus::after {
 }
 .xeditor-icon-bold {
     background-position: 10px 8px;
+}
+.xeditor-icon-font {
+    background-position: 8px -237px;
 }
 .xeditor-icon-emotion {
     background-position: 5px -163px;
@@ -221,14 +188,10 @@ figure figcaption:focus::after {
     background-position: 6px -589px;
 }
 
-/* dialog */
-#xeditor-dialog-dialog {
-    color: #808080;
-}
 
 /* emotion */
 .xeditor-emotion-wrapper {
-    width: 600px;
+    width: 400px;
 }
 .xeditor-emotion-content {
     padding: 16px 5px;
@@ -245,6 +208,45 @@ figure figcaption:focus::after {
 .xeditor-emotion-item:hover {
     background-color: #ddd;
 }
+
+
+/**
+ * font
+ */
+.xeditor-font-wrapper {
+    width: 100px;
+    padding: 5px 0;
+    text-align: center;
+}
+.xeditor-font-wrapper h1,
+.xeditor-font-wrapper h2,
+.xeditor-font-wrapper p {
+    font-size: 16px;
+    line-height: 32px;
+    cursor: pointer;
+    font-weight: normal;
+}
+.xeditor-font-wrapper h1:hover,
+.xeditor-font-wrapper h1.active,
+.xeditor-font-wrapper h2:hover,
+.xeditor-font-wrapper h2.active,
+.xeditor-font-wrapper p:hover {
+    background-color: #eee;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* link */
 .xeditor-link-title {

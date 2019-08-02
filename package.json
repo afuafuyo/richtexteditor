@@ -1,0 +1,19 @@
+{
+  "name": "richtexteditor",
+  "version": "1.0.0",
+  "description": "richtexteditor",
+  "main": "",
+  "scripts": {
+    "build": "node ./build.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^8.0.26",
+    "rollup": "^1.7.0",
+    "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-uglify": "^6.0.2",
+    "tslib": "^1.9.3",
+    "typescript": "^3.3.3333"
+  }
+}

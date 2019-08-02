@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <link rel="stylesheet" href="../index.css">
-    <script src="../index.js"></script>
-    <script src="../widgets.js"></script>
-    <script src="../fileupload.js"></script>
+    <script src="../dist/editor.js"></script>
+    <script src="../dist/fileupload.js"></script>
+    <link rel="stylesheet" href="../dist/editor.css">
 </head>
 <body>
 <div style="width: 900px; margin: 0 auto; border: 1px solid red">
@@ -17,7 +16,6 @@
     <button onclick="getContent()">获取内容</button>
     <button onclick="getPlainText()">获取text内容</button>
     <button onclick="destroy()">销毁</button>
-    <button onclick="getUbb()">Ubb</button>
 </div>
     
 <script>
@@ -36,10 +34,10 @@ ScrollFix.prototype = {
 
         this.bar = this.editor.widgetsWrapper;
         this.barWidth = this.bar.clientWidth;
-        this.barOffset = XEditor.tools.dom.getOffset(this.bar);
+        this.barOffset = XEditor.Tools.getOffset(this.bar);
 
         window.addEventListener('resize', function() {
-            _self.barOffset = XEditor.tools.dom.getOffset(_self.bar);
+            _self.barOffset = XEditor.Tools.getOffset(_self.bar);
         });
         window.addEventListener("scroll", function () {
             _self.scrollHandler();
@@ -67,6 +65,7 @@ ScrollFix.prototype = {
 
 
 var editor = new XEditor({
+    widgets: ['bold', 'font', 'emotion', 'blockquote'],
     plugins: [ScrollFix],
     // 图片上传地址
     server: 'http://localhost:8080/up.php'
@@ -86,7 +85,7 @@ editor.on('contentFocus', () => {
 });
 
 // 渲染
-editor.render('mydemo');
+editor.render(document.getElementById('mydemo'));
 
 
 function getContent() {
@@ -97,9 +96,6 @@ function getPlainText() {
 }
 function destroy() {
     editor.destroy();
-}
-function getUbb() {
-    console.log(editor.getUbb());
 }
 </script>
 </body>
