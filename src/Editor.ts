@@ -123,7 +123,7 @@ export default class Editor {
             lineMode: 'p',
             
             // upload url
-            server: ''
+            uploadServer: ''
         };
 
         this.init(options);
@@ -169,7 +169,7 @@ export default class Editor {
                 
             } else {
                 item = this.doc.createElement('span');
-                item.setAttribute('data-action', this.configs.widgets[i]);
+                item.setAttribute('data-internalwidgetaction', this.configs.widgets[i]);
                 item.className = 'xeditor-widgets-item xeditor-icon xeditor-icon-' + this.configs.widgets[i];
             
                 this.widgetControllerInstances[this.configs.widgets[i]] =
@@ -202,9 +202,9 @@ export default class Editor {
         let _self = this;
         
         // widgets
-        this.widgetsWrapper.onmousedown = function() {
-            return false;
-        };
+        // this.widgetsWrapper.onmousedown = function() {
+        //     return false;
+        // };
         this.widgetsWrapper.onclick = function(e) {
             _self.handlerWidgetClickEvent(e);
         };
@@ -236,7 +236,7 @@ export default class Editor {
     public handlerWidgetClickEvent(e: any): void {
         let target = e.target;
         
-        let action = target.getAttribute('data-action');
+        let action = target.getAttribute('data-internalwidgetaction');
         
         // 只有触发事件的对象才处理
         if(null === action) {

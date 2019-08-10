@@ -53,20 +53,18 @@ export default class Tools {
         element.className = Tools.trimChar(replaced, ' ');
     }
 
-    public static getOffset(elem: any): any {
-        if ( !elem.getClientRects().length ) {
-            return { top: 0, left: 0 };
-        }
-    
-        let rect = elem.getBoundingClientRect();
-        let doc = elem.ownerDocument;
-        let docElem = doc.documentElement;
-        let win = doc.defaultView;
+    public static hasChild(wrapper: any, node: any): boolean {
+        let ret = false;
 
-        return {
-            top: rect.top + win.pageYOffset - docElem.clientTop,
-            left: rect.left + win.pageXOffset - docElem.clientLeft
-        };
+        for(let i=0, len=wrapper.childNodes.length; i<len; i++) {
+            if(node === wrapper.childNodes[i]) {
+                ret = true;
+
+                break;
+            }
+        }
+
+        return ret;
     }
 
 }

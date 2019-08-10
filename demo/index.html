@@ -29,15 +29,30 @@ function ScrollFix(editor) {
 }
 ScrollFix.prototype = {
     constructor: ScrollFix,
+    getOffset: function(elem) {
+        if ( !elem.getClientRects().length ) {
+            return { top: 0, left: 0 };
+        }
+    
+        let rect = elem.getBoundingClientRect();
+        let doc = elem.ownerDocument;
+        let docElem = doc.documentElement;
+        let win = doc.defaultView;
+
+        return {
+            top: rect.top + win.pageYOffset - docElem.clientTop,
+            left: rect.left + win.pageXOffset - docElem.clientLeft
+        };
+    },
     handler: function() {
         var _self = this;
 
         this.bar = this.editor.widgetsWrapper;
         this.barWidth = this.bar.clientWidth;
-        this.barOffset = XEditor.Tools.getOffset(this.bar);
+        this.barOffset = this.getOffset(this.bar);
 
         window.addEventListener('resize', function() {
-            _self.barOffset = XEditor.Tools.getOffset(_self.bar);
+            _self.barOffset = _self.getOffset(_self.bar);
         });
         window.addEventListener("scroll", function () {
             _self.scrollHandler();
@@ -65,7 +80,7 @@ ScrollFix.prototype = {
 
 
 var editor = new XEditor({
-    widgets: ['bold', 'font', 'emotion', 'blockquote'],
+    widgets: ['bold', 'font', 'blockquote', '-', 'emotion', 'image'],
     plugins: [ScrollFix],
     // 图片上传地址
     server: 'http://localhost:8080/up.php'

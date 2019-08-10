@@ -3,7 +3,7 @@
  */
 .xeditor-pop-wrapper {
     position: absolute;
-    top: 36px;
+    top: 40px;
     left: 0;
     background-color: #fff;
     border: 1px solid #ddd;
@@ -88,7 +88,7 @@
 }
 .xeditor-inputtext-wrapper input[type="text"] {
     display: inline-block;
-    padding: 10px 0;
+    height: 28px;
     width: 100%;
     border: 0;
     outline: none;
@@ -116,9 +116,7 @@
     vertical-align: top;
     background-color: #e7eaf1;
 }
-.xeditor-widgets-item {
-    position: relative;
-}
+.xeditor-widgets-item {}
 .xeditor-content-wrapper {}
 .xeditor-content-root {
     padding: 12px 20px;
@@ -235,30 +233,22 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* link */
-.xeditor-link-title {
-    font-size: 20px;
-    text-align: center;
-    padding: 20px 0;
-}
-.xeditor-link-content {
-    margin: 10px 20px 20px 20px;
-}
-
 /* image */
+.xeditor-uploadimage-wrapper {
+    width: 400px;
+}
+.xeditor-dialog-tabs a {
+    display: inline-block;
+    line-height: 40px;
+    padding: 0 10px;
+    color: #000;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid #fff;
+}
+.xeditor-dialog-tabs a.active {
+    border-bottom-color: #00a1d6;
+}
 .xeditor-uploadimage-content {}
 .xeditor-uploadimage-content-local {
     height: 132px;
@@ -343,37 +333,15 @@
     opacity: 0;
     cursor: pointer;
 }
-
-/* align */
-.xeditor-align-item {
-    display: block;
-    width: 60px;
-    height: 32px;
-    line-height: 32px;
-    font-size: 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color .2s linear;
-}
-.xeditor-align-item:hover {
-    background-color: #fff;
-}
-.xeditor-icon-align:hover .xeditor-dropdown-wrapper {
-    display: block;
+.xeditor-dialog-footer {
+    margin: 10px;
+    text-align: right;
 }
 
-/* separator */
-.xeditor-separator-item {
-    width: 120px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-}
-.xeditor-separator-item:hover {
-    background-color: #fff;
-    cursor: pointer;
-}
-.xeditor-icon-separator:hover .xeditor-dropdown-wrapper {
-    display: block;
-}
+
+
+
+
+
+
 

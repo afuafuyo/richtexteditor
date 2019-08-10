@@ -9,7 +9,7 @@
  *
  * eg.
  *
- * var up = new XFileUpload({
+ * var up = new FileUpload({
  *      id: 'inputComponentId',
  *      server: '/api/upload',
  *      fieldName: 'file'
@@ -38,7 +38,7 @@
  * }
  *
  */
-var XFileUpload = function(options) {
+export default function FileUpload(options) {
     this.doc = document;
     this.fileInput = null;
     
@@ -80,8 +80,8 @@ var XFileUpload = function(options) {
     this.initOptions(options);
     this.initInputComponent();
 };
-XFileUpload.prototype = {
-    constructor: XFileUpload,
+FileUpload.prototype = {
+    constructor: FileUpload,
     extend: function(origin, configs) {
         if(undefined === configs) {
             return origin;
@@ -192,14 +192,14 @@ XFileUpload.prototype = {
         }
         
         if(null === this.filesQueue) {
-            this.filesQueue = new XFileUpload.Queue();
+            this.filesQueue = new FileUpload.Queue();
         }
         
         var i = 0;
         var len = fileList.length;
         var tmpFile = null;
         for(; i<len; i++) {
-            tmpFile = new XFileUpload.File(fileList[i]);
+            tmpFile = new FileUpload.File(fileList[i]);
             
             // 检查规则
             if(!this.isValidFile(tmpFile)) {
@@ -287,13 +287,13 @@ XFileUpload.prototype = {
         this.uploadAsBinary(file);
     }
 };
-XFileUpload.Queue = function() {
+FileUpload.Queue = function() {
     this.headNode = null;
     this.tailNode = null;
     this.size = 0;
 };
-XFileUpload.Queue.prototype.add = function(data) {
-    var node = new XFileUpload.QueueNode(data, null);
+FileUpload.Queue.prototype.add = function(data) {
+    var node = new FileUpload.QueueNode(data, null);
     
     if(0 === this.size) {
         this.headNode = node;
@@ -306,7 +306,7 @@ XFileUpload.Queue.prototype.add = function(data) {
     
     this.size++;
 };
-XFileUpload.Queue.prototype.take = function() {
+FileUpload.Queue.prototype.take = function() {
     // 为空直接返回
     if(0 === this.size) {
         return null;
@@ -329,12 +329,12 @@ XFileUpload.Queue.prototype.take = function() {
     
     return data;
 };
-XFileUpload.Queue.prototype.clear = function() {
+FileUpload.Queue.prototype.clear = function() {
     while(0 !== this.size) {
         this.take();
     }
 };
-XFileUpload.Queue.prototype.toArray = function() {
+FileUpload.Queue.prototype.toArray = function() {
     var ret = [];
     
     var i = 0;
@@ -346,14 +346,14 @@ XFileUpload.Queue.prototype.toArray = function() {
     
     return ret;
 },
-XFileUpload.QueueNode = function(data, next) {
+FileUpload.QueueNode = function(data, next) {
     this.data = data;
     this.next = next;
 };
-XFileUpload.File = function(file) {
+FileUpload.File = function(file) {
     this.nativeFile = file;
     
-    this.id = 'xef' + XFileUpload.File.uuid++;
+    this.id = 'xef' + FileUpload.File.uuid++;
     /**
      * The name of the file referenced by the File object
      */
@@ -375,4 +375,4 @@ XFileUpload.File = function(file) {
      */
     this.lastModified = file.lastModified;
 };
-XFileUpload.File.uuid = 0;
+FileUpload.File.uuid = 0;

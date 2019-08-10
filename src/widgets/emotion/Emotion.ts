@@ -1,5 +1,6 @@
 import Editor from '../../Editor';
 import Editable from '../../Editable';
+import Tools from '../../Tools';
 
 import IWidget from '../IWidget';
 
@@ -51,8 +52,6 @@ class Emotion extends IWidget {
         this.popWrapper = doc.createElement('div');
         this.popWrapper.className = 'xeditor-pop-wrapper';
         this.popWrapper.innerHTML = html;
-        
-        this.button.appendChild(this.popWrapper);
     }
 
     private bindEvent(): void {
@@ -78,8 +77,8 @@ class Emotion extends IWidget {
         this.button.ownerDocument.addEventListener('click', (e) => {
             var t = e.target;
             
-            // 点击表情按钮要执行打开操作
-            if('emotion' === t.getAttribute('data-action')) {
+            // 点击按钮要执行打开操作
+            if('emotion' === t.getAttribute('data-internalwidgetaction')) {
                 return;
             }
             
@@ -88,14 +87,19 @@ class Emotion extends IWidget {
     }
 
     private close() {
-        this.button.lastChild.style.display = 'none';
+        this.popWrapper.style.display = 'none';
     }
 
     /**
      * @inheritdoc
      */
     onClick(editor: any) {
-        this.button.lastChild.style.display = 'block';
+        if(!Tools.hasChild(this.button.parentNode, this.popWrapper)) {
+            this.button.parentNode.appendChild(this.popWrapper);
+            this.popWrapper.style.left = this.button.offsetLeft + 'px';
+        }
+        
+        this.popWrapper.style.display = 'block';
     }
 
     /**
