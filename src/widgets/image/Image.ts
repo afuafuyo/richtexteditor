@@ -4,7 +4,7 @@ import Tools from '../../Tools';
 
 import IWidget from '../IWidget';
 
-import FileUpload from '../../FileUpload';
+import FileUploader from '../../FileUploader';
 
 /**
  * image
@@ -89,13 +89,13 @@ class Image extends IWidget {
                 let images = imageListWrapper.querySelectorAll('img');
                 let firstTab = wrapper.querySelector('a');
                 
-                // 添加图片
+                // 本地图片
                 if(firstTab.className.indexOf('active') >= 0) {
                     for(let i=0,len=images.length; i<len; i++) {
                         ret += '<p><img src="'+ images[i].getAttribute('src') +'"></p>';
                     }
                     
-                } else {
+                } else if(remoteImageInput.value) {
                     ret = '<p><img src="'+ remoteImageInput.value +'"></p>';
                 }
                 
@@ -121,11 +121,10 @@ class Image extends IWidget {
             ['<div class="xeditor-uploadimage-wrapper">',
                 '<div class="xeditor-dialog-tabs">',
                     '<a class="active" href="javascript:;" data-action="local">本地图片</a>',
-                    '<a href="javascript:;" data-action="remote">网络图片</a>',
+                    //'<a href="javascript:;" data-action="remote">网络图片</a>',
                 '</div>',
                 '<div class="xeditor-uploadimage-content xeditor-uploadimage-content-local">',
-                    '<div class="xeditor-uploadimage-uploadlist">',
-                    '</div>',
+                    '<div class="xeditor-uploadimage-uploadlist"></div>',
                     '<div class="xeditor-uploadimage-uploadbtn">',
                         '<input id="xeditor-uploadimage-inputfile" type="file" class="xeditor-uploadimage-input">',
                     '</div>',
@@ -154,7 +153,7 @@ class Image extends IWidget {
     private initUpload(): void {
         let _self = this;
         
-        this.uploader = new FileUpload({
+        this.uploader = new FileUploader({
             server: this.editor.configs.uploadServer
         });
         this.uploader.fileQueuedHandler = (file) => {

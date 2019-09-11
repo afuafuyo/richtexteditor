@@ -37,7 +37,7 @@ async function build() {
 }
 
 function cp() {
-    process.exec('cp -rf ./src/editor.css ./src/fileupload.js ./src/icons/ ./dist/');
+    process.exec('cp -rf ./src/editor.css ./src/icons/ ./dist/');
 }
 
 // run
