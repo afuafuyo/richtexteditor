@@ -161,6 +161,7 @@ FileUpload.prototype = {
         };
     },
     initInputComponent: function() {
+        var _self = this;
         if('' === this.configs.id) {
             return;
         }
