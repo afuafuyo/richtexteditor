@@ -115,6 +115,7 @@ export default class Editor {
         this.originContent = '';
 
         this.configs = {
+            autoFocus: false,
             reactionTime: 200,
             plugins: [],
             widgets: [],
@@ -321,7 +322,9 @@ export default class Editor {
         // event
         this.initEvent();
         
-        this.resetRangeAtEndElement();
+        if(this.configs.autoFocus) {
+            this.resetRangeAtEndElement();
+        }
         
         // 初始化插件
         this.runPlugins();
