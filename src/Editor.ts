@@ -121,10 +121,7 @@ export default class Editor {
             widgets: [],
             minHeight: '200',
             contentClassName: '',
-            lineMode: 'p',
-            
-            // upload url
-            uploadServer: ''
+            lineMode: 'p'
         };
 
         this.init(options);
@@ -281,9 +278,15 @@ export default class Editor {
     }
 
     public runPlugins(): void {
+        let list = this.configs.plugins;
+        
         // 直接执行
-        for(let i=0, len=this.configs.plugins.length; i<len; i++) {
-            new this.configs.plugins[i](this);
+        for(let i=0, len=list.length; i<len; i++) {
+            if(!list[i].className) {
+                continue;
+            }
+            
+            new list[i].className(this, list[i].options);
         }
     }
 
@@ -322,12 +325,13 @@ export default class Editor {
         // event
         this.initEvent();
         
+        // 初始化插件
+        this.runPlugins();
+        
+        // 光标
         if(this.configs.autoFocus) {
             this.resetRangeAtEndElement();
         }
-        
-        // 初始化插件
-        this.runPlugins();
         
         this.fire('ready');
     }

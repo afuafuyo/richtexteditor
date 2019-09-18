@@ -153,18 +153,30 @@ class Image extends IWidget {
     private initUpload(): void {
         let _self = this;
         
+        // configs
+        let options = this.editor.configs.widgetsOptions;
+        if(undefined === options || undefined === options.image) {
+            throw new Error('image need configs');
+        }
+        
         this.uploader = new FileUploader({
-            server: this.editor.configs.uploadServer
+            id: 'xeditor-uploadimage-inputfile',
+            fieldName: options.image.fieldName,
+            accept: options.image.accept,
+            fileSizeLimit: options.image.fileSizeLimit
         });
         this.uploader.fileQueuedHandler = (file) => {
             _self.renderProgressView(file);
         };
         // 选完文件手动调用上传
         this.uploader.filesQueuedCompleteHandler = (obj) => {
-            // todo some other things
-            // eg. 设置一些 post 参数
-            // _self.uploader.setPostParam('token', 'xxxxx');
-            _self.uploader.startUpload();
+            // todo some prepare things
+            options.image.beforeUpload((ret) => {
+                _self.uploader.configs.server = ret.server;
+                _self.uploader.replacePostParams(ret.params);
+                
+                _self.uploader.startUpload();
+            });
         };
         this.uploader.uploadProgressHandler = (file, percent) => {
             let wrapper = _self.editor.doc.getElementById(file.id);
@@ -172,6 +184,7 @@ class Image extends IWidget {
             wrapper.firstChild.firstChild.style.width = percent * 100 + '%';
         };
         this.uploader.uploadSuccessHandler = (file, serverData) => {
+            // {data: 'xxx.jpg'}
             let data = JSON.parse(serverData);
             
             _self.renderImageView(file, data);
