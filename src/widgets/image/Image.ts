@@ -188,6 +188,10 @@ class Image extends IWidget {
             let data = JSON.parse(serverData);
             
             _self.renderImageView(file, data);
+            
+            if(undefined !== options.image.uploadSuccess) {
+                options.image.uploadSuccess(data);
+            }
         };
         this.uploader.uploadCompleteHandler = function() {
             //console.log('done');
@@ -252,6 +256,11 @@ class Image extends IWidget {
             this.bindEvent();
             this.initUpload();
         }
+        
+        // 清空图片
+        let wrapper = this.popWrapper.querySelector('.xeditor-uploadimage-wrapper');
+        let listWrapper = wrapper.querySelector('.xeditor-uploadimage-uploadlist');
+        listWrapper.innerHTML = '';
 
         this.popWrapper.style.display = 'block';
     }
