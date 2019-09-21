@@ -184,14 +184,14 @@ class Image extends IWidget {
             wrapper.firstChild.firstChild.style.width = percent * 100 + '%';
         };
         this.uploader.uploadSuccessHandler = (file, serverData) => {
-            // {data: 'xxx.jpg'}
-            let data = JSON.parse(serverData);
-            
-            _self.renderImageView(file, data);
-            
-            if(undefined !== options.image.uploadSuccess) {
-                options.image.uploadSuccess(data);
+            if(undefined === options.image.processSuccessData) {
+                return;
             }
+            
+            // {uri: 'somepath.jpg'}
+            let data = options.image.processSuccessData(serverData);
+            
+            _self.renderImageView(file, data.uri);
         };
         this.uploader.uploadCompleteHandler = function() {
             //console.log('done');
@@ -221,7 +221,7 @@ class Image extends IWidget {
         listWrapper.appendChild(div);
     }
 
-    private renderImageView(file, data): void {
+    private renderImageView(file, src): void {
         /*
         <div class="xeditor-uploadimage-imageitem">
             <a href="javascript:;" class="xeditor-uploadimage-delete">&times;</a>
@@ -237,7 +237,7 @@ class Image extends IWidget {
         let div = doc.createElement('div');
         div.className = 'xeditor-uploadimage-imageitem';
         div.innerHTML = '<a data-action="del" href="javascript:;" class="xeditor-uploadimage-delete">&times;</a>'
-            + '<img src="'+ data.data +'">';
+            + '<img src="'+ src +'">';
         
         listWrapper.insertBefore(div, old);
         listWrapper.removeChild(old);
