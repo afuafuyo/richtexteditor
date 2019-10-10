@@ -10,7 +10,7 @@ const uglify = require('rollup-plugin-uglify');
 let version = require('./package.json').version;
 let banner =
 `/**
- * DYMEditor
+ * XEditor
  *
  * @version ${version}
  */`;
@@ -37,7 +37,7 @@ async function build() {
 }
 
 function cp() {
-    process.exec('cp -rf ./src/editor.css ./src/icons/ ./dist/');
+    process.exec('cp -rf ./src/editor.css ./src/icons/ ./README.md ./dist/');
 }
 
 // run
