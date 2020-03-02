@@ -52,12 +52,12 @@ export default class Editable {
     public static backupCurrentRange(range?: any): void {
         if(undefined !== range) {
             Editable._currentRange = range;
-            
+
             return;
         }
-        
+
         let gettedRange = Range.getSingleRangeFromNativeSelection();
-        
+
         if(null !== gettedRange) {
             Editable._currentRange = gettedRange;
         }
@@ -67,27 +67,27 @@ export default class Editable {
         if(null === Editable._currentRange) {
             return;
         }
-        
+
         let selection = Range.getSelectionFromNative();
-        
+
         if(null === selection) {
             return;
         }
-        
+
         if(selection.rangeCount > 0) {
             selection.removeAllRanges();
         }
-        
+
         selection.addRange(Editable._currentRange.nativeRange);
     }
 
     public static resetRangeAt(node: any, toEnd?: boolean): void {
         var range = Range.createNativeRange();
-    
+
         if(null === range) {
             return;
         }
-    
+
         if(true === toEnd) {
             // If the nodeType of node is one of Text, Comment, or CDATASection
             // then the offset is the number of characters contained in the node.
@@ -97,12 +97,12 @@ export default class Editable {
                 : node.childNodes.length;
             range.setStart(node, position);
             range.setEnd(node, position);
-            
+
         } else {
             range.setStart(node, 0);
             range.setEnd(node, 0);
         }
-    
+
         Editable.backupCurrentRange(new Range(range));
         Editable.resumeSelection();
     }
@@ -112,33 +112,33 @@ export default class Editable {
         if(null === range) {
             return;
         }
-        
+
         // 执行命令前 需要知道光标的位置
         Editable.resumeSelection();
-        
+
         let doc = document;
         let fragement = null;
-        
+
         // 插入文本
         if(Editable.TYPE_TEXT === type) {
             fragement = doc.createTextNode(data);
-            
+
             range.insertNode(fragement);
             range.collapse(false);
-            
+
             Editable.backupCurrentRange();
             return;
         }
-        
+
         Editable.execCommand('insertHTML', false, data);
-        
+
         Editable.backupCurrentRange();
     }
 
     public static execCommand(aCommandName: string, aShowDefaultUI: boolean, aValueArgument: string): boolean {
         // 执行命令前 需要知道光标的位置
         Editable.resumeSelection();
-            
+
         return document.execCommand(aCommandName, aShowDefaultUI, aValueArgument);
     }
 

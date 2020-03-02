@@ -23,18 +23,18 @@ class Bold extends IWidget {
      */
     onClick(editor: any) {
         let range = Editable.getCurrentRange();
-        
+
         if(null === range) {
             return;
         }
-        
+
         // 如果没有选中文本 那么不做处理
         if(range.collapsed) {
             return;
         }
-        
+
         Editable.execCommand('bold', false, null);
-        
+
         this.editor.fire('selectionchange');
     }
 
@@ -45,10 +45,10 @@ class Bold extends IWidget {
         let ret = Editable.queryCommandState('bold');
         if(true === ret) {
             Tools.addClass(this.button, 'active');
-            
+
             return;
         }
-        
+
         Tools.removeClass(this.button, 'active');
     }
 }

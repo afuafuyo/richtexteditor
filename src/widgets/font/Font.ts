@@ -4,6 +4,8 @@ import Tools from '../../Tools';
 
 import IWidget from '../IWidget';
 
+import Pop from '../../com/Pop';
+
 /**
  * font
  */
@@ -11,8 +13,8 @@ class Font extends IWidget {
     public button: any;
     public editor: any;
 
-    private popWrapper: any;
-    private nowFont: string; 
+    private pop: any;
+    private nowFont: string;
 
     constructor(button: any, editor: any) {
         super(editor);
@@ -22,8 +24,7 @@ class Font extends IWidget {
 
         this.nowFont = '';
 
-        this.init();
-        this.bindEvent();
+        this.pop = null;
     }
 
     private getHtml(): string {
@@ -38,47 +39,40 @@ class Font extends IWidget {
         return html;
     }
 
-    private init(): void {
-        let doc = this.button.ownerDocument;
-        
-        this.popWrapper = doc.createElement('div');
-        this.popWrapper.className = 'xeditor-pop-wrapper';
-    }
-
     private bindEvent(): void {
         let _self = this;
-        
-        this.popWrapper.onclick = (e) => {
+
+        this.pop.getWrapperDom().onclick = (e) => {
             // 阻止冒泡
             if(e.stopPropagation) {
                 e.stopPropagation();
             }
-            
+
             let target = e.target;
             let role = target.getAttribute('data-role');
-            
+
             if(null !== role) {
                 _self.setFont(role);
 
                 _self.close();
             }
         };
-        
+
         // 点击空白关闭
         this.button.ownerDocument.addEventListener('click', (e) => {
             var t = e.target;
-            
+
             // 点击按钮要执行打开操作
             if('font' === t.getAttribute('data-internalwidgetaction')) {
                 return;
             }
-            
+
             _self.close();
         });
     }
 
     private close() {
-        this.popWrapper.style.display = 'none';
+        this.pop.getWrapperDom().style.display = 'none';
     }
 
     public setFont(role: string): void {
@@ -94,7 +88,7 @@ class Font extends IWidget {
 
         let tag = this.editor.configs.lineMode;
         let nodeName = outer.nodeName.toLowerCase();
-        
+
         if('blockquote' === nodeName) {
             outer = range.pathInfo()[1];
             nodeName = outer.nodeName.toLowerCase();
@@ -139,14 +133,19 @@ class Font extends IWidget {
      * @inheritdoc
      */
     onClick() {
-        if(!Tools.hasChild(this.button.parentNode, this.popWrapper)) {
-            this.button.parentNode.appendChild(this.popWrapper);
+        if(null === this.pop) {
+            this.pop = Pop.getInstance();
 
-            this.popWrapper.style.left = this.button.offsetLeft + 'px';
-            this.popWrapper.innerHTML = this.getHtml();
+            this.button.parentNode.appendChild(this.pop.getWrapperDom());
+            this.pop.getWrapperDom().style.left = this.button.offsetLeft + 'px';
+
+            this.bindEvent();
         }
 
-        this.popWrapper.style.display = 'block';
+        // 由于要设置标题文字 active 状态 所以这里每次都重新加载 html
+        this.pop.getContentDom().innerHTML = this.getHtml();
+
+        this.pop.getWrapperDom().style.display = 'block';
     }
 
     /**

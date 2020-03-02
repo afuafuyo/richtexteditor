@@ -78,7 +78,7 @@ export default class Editor {
      * fragment
      */
     public fragment: any;
-    
+
     /**
      * 挂件缓存
      */
@@ -88,12 +88,12 @@ export default class Editor {
      * 事件映射表
      */
     public eventBinMap: any;
-    
+
     /**
      * 原内容
      */
     public originContent: string;
-    
+
     /**
      * 配置
      */
@@ -131,11 +131,11 @@ export default class Editor {
         if(undefined === configs) {
             return origin;
         }
-        
+
         for(let k in configs) {
             origin[k] = configs[k];
         }
-        
+
         return origin;
     }
 
@@ -158,32 +158,32 @@ export default class Editor {
     public initWidgetsStructure(): void {
         this.widgetsWrapper = this.doc.createElement('div');
         this.widgetsWrapper.className = 'xeditor-widgets-wrapper';
-        
+
         let item = null;
         for(let i=0, len=this.configs.widgets.length; i<len; i++) {
             if('-' === this.configs.widgets[i]) {
                 item = this.doc.createElement('i');
                 item.className = 'xeditor-widgets-separator';
-                
+
             } else {
                 item = this.doc.createElement('span');
                 item.setAttribute('data-internalwidgetaction', this.configs.widgets[i]);
                 item.className = 'xeditor-widgets-item xeditor-icon xeditor-icon-' + this.configs.widgets[i];
-            
+
                 this.widgetControllerInstances[this.configs.widgets[i]] =
                     new Editor.widgetControllers[this.configs.widgets[i]](item, this);
             }
-            
+
             this.widgetsWrapper.appendChild(item);
         }
-        
+
         this.fragment.appendChild(this.widgetsWrapper);
     }
 
     public initContentStructure(): void {
         this.contentWrapper = this.doc.createElement('div');
         this.root = this.doc.createElement('div');
-        
+
         this.contentWrapper.className = 'xeditor-content-wrapper';
         this.root.className = 'xeditor-content-root'
             + ('' === this.configs.contentClassName ? '' : ' ' + this.configs.contentClassName);
@@ -191,14 +191,14 @@ export default class Editor {
         this.root.setAttribute('spellcheck', false);
         this.root.setAttribute('data-role', 'xeditor-root');
         this.root.style.minHeight = this.configs.minHeight + 'px';
-        
+
         this.contentWrapper.appendChild(this.root);
         this.fragment.appendChild(this.contentWrapper);
     }
 
     public initEvent(): void {
         let _self = this;
-        
+
         // widgets
         // this.widgetsWrapper.onmousedown = function() {
         //     return false;
@@ -206,7 +206,7 @@ export default class Editor {
         this.widgetsWrapper.onclick = function(e) {
             _self.handlerWidgetClickEvent(e);
         };
-        
+
         // content
         this.root.onkeydown = function(e) {
             _self.handlerKeydownEvent(e);
@@ -233,22 +233,22 @@ export default class Editor {
 
     public handlerWidgetClickEvent(e: any): void {
         let target = e.target;
-        
+
         let action = target.getAttribute('data-internalwidgetaction');
-        
+
         // 只有触发事件的对象才处理
         if(null === action) {
             return;
         }
-        
+
         if(undefined === this.widgetControllerInstances[action]) {
             return;
         }
-        
+
         if(undefined === this.widgetControllerInstances[action].onClick) {
             throw new Error('The widget: '+ action +' has no onClick method');
         }
-        
+
         this.widgetControllerInstances[action].onClick(this);
     }
 
@@ -263,29 +263,29 @@ export default class Editor {
             // 所以下面手动多调用了一次 backupCurrentRange 保证按键后场景更新
             this.setContent('');
         }
-        
+
         Editable.backupCurrentRange();
-        
+
         this.fire('keyup', null);
         this.fire('selectionchange');
     }
 
     public handlerContentClickEvent(e: any): void {
         Editable.backupCurrentRange();
-        
+
         this.fire('contentFocus', null);
         this.fire('selectionchange');
     }
 
     public runPlugins(): void {
         let list = this.configs.plugins;
-        
+
         // 直接执行
         for(let i=0, len=list.length; i<len; i++) {
             if(!list[i].className) {
                 continue;
             }
-            
+
             new list[i].className(this, list[i].options);
         }
     }
@@ -301,38 +301,38 @@ export default class Editor {
         this.wrapper = mountNode;
         this.wrapper.className = 'xeditor-wrapper';
         this.originContent = this.wrapper.innerHTML;
-        
+
         // 清空内容
         this.clearElementContent(this.wrapper);
-        
+
         // 初始化插件区
         this.initWidgetsStructure();
-        
+
         // 初始化内容区
-        this.initContentStructure();        
-        
+        this.initContentStructure();
+
         // 还原原始内容
         if('' === this.originContent) {
             this.root.innerHTML = this.initEmptyContent();
-            
+
         } else {
             this.root.innerHTML = this.originContent;
         }
-        
+
         // dom 渲染
         this.wrapper.appendChild(this.fragment);
-        
+
         // event
         this.initEvent();
-        
+
         // 初始化插件
         this.runPlugins();
-        
+
         // 光标
         if(this.configs.autoFocus) {
             this.resetRangeAtEndElement();
         }
-        
+
         this.fire('ready');
     }
 
@@ -345,7 +345,7 @@ export default class Editor {
         if(undefined === toEnd) {
             toEnd = false;
         }
-        
+
         Editable.resetRangeAt(this.root.lastChild, toEnd);
     }
 
@@ -354,7 +354,7 @@ export default class Editor {
      */
     public getContent(): string {
         let tmp = this.root.innerHTML;
-        
+
         // 去除多余空白
         return tmp.replace(/\u200B/g, '');
     }
@@ -368,7 +368,7 @@ export default class Editor {
         this.root.innerHTML = '' === data
             ? this.initEmptyContent()
             : data;
-        
+
         this.resetRangeAtEndElement();
     }
 
@@ -392,18 +392,18 @@ export default class Editor {
             }
         }
         this.widgetControllerInstances = null;
-        
+
         this.deleteEvent();
         // 清空 dom
         this.clearElementContent(this.wrapper);
-        
+
         this.root = null;
         this.contentWrapper = null;
         this.widgetsWrapper = null;
         this.wrapper = null;
-        
+
         this.fragment = null;
-        
+
         // 清空事件
         this.eventBinMap = {};
     }
@@ -419,20 +419,20 @@ export default class Editor {
         if(undefined === thisObject) {
             thisObject = null;
         }
-        
+
         let map = this.eventBinMap;
-        
+
         if(undefined === map[eventName]) {
             map[eventName] = [];
         }
-        
+
         let eventBin = {
             target: this,
             type: eventName,
             handler: handler,
             thisObject: thisObject
         };
-        
+
         map[eventName].push(eventBin);
     }
 
@@ -445,21 +445,21 @@ export default class Editor {
      */
     public off(eventName: string, handler: any, thisObject: any): void {
         let map = this.eventBinMap;
-        
+
         if(undefined === map[eventName]) {
             return;
         }
-        
+
         if(undefined === thisObject) {
             thisObject = null;
         }
-        
+
         for(let i=0, len=map[eventName].length, bin=null; i<len; i++) {
             bin = map[eventName][i];
-            
+
             if(thisObject === bin.thisObject && handler === bin.handler) {
                 map[eventName].splice(i, 1);
-                
+
                 break;
             }
         }
@@ -473,14 +473,14 @@ export default class Editor {
      */
     public fire(eventName: string, data?: any): void {
         let map = this.eventBinMap;
-        
+
         if(undefined === map[eventName]) {
             return;
         }
-        
+
         for(let i=0, len=map[eventName].length, bin=null; i<len; i++) {
             bin = map[eventName][i];
-            
+
             bin.handler.call(bin.thisObject, data);
         }
     }

@@ -9,8 +9,8 @@
  *
  * eg.
  *
- * var up = new FileUpload({
- *      id: 'inputComponentId',
+ * const up = new FileUpload({
+ *      fileElement: domElement,
  *      server: '/api/upload',
  *      fieldName: 'file'
  * });
@@ -21,7 +21,7 @@
  *
  * up.filesQueuedCompleteHandler = function(obj) {
  *      // called on all selected files queued
- * 
+ *
  *      // up.startUpload();
  * }
  *
@@ -40,13 +40,12 @@
  */
 export default function FileUpload(options) {
     this.doc = document;
-    this.fileInput = null;
-    
+
     this.xhr = new XMLHttpRequest();
-    
+
     // 文件队列
     this.filesQueue = null;
-    
+
     // 一个文件加入队列后事件
     this.fileQueuedHandler = null;
     // 文件加入队列时出错
@@ -61,24 +60,24 @@ export default function FileUpload(options) {
     this.uploadSuccessHandler = null;
     // 队列文件全部上传完毕
     this.uploadCompleteHandler = null;
-    
+
     this.configs = {
-        id: '',
+        fileElement: null,
         postParams: {}
         ,headers: {}
         ,server: ''
         ,fieldName: 'xeditorfile'
         ,useFormData: true
         ,withCredentials: false
-        
+
         ,auto: false
         ,multiple: false
         ,accept: 'image/jpg, image/jpeg, image/png, image/gif'
         ,fileSizeLimit: 1024 * 1024  // 1Mb
     };
-    
+
     this.initOptions(options);
-    this.initInputComponent();
+    this.initFileComponent();
 };
 FileUpload.prototype = {
     constructor: FileUpload,
@@ -86,165 +85,182 @@ FileUpload.prototype = {
         if(undefined === configs) {
             return origin;
         }
-        
-        for(var k in configs) {
+
+        for(let k in configs) {
             origin[k] = configs[k];
         }
-        
+
         return origin;
     },
     fireEvent: function(eventName, data, message) {
-        var handler = eventName + 'Handler';
-        
+        let handler = eventName + 'Handler';
+
         if(null === this[handler]) {
             return;
         }
-        
+
         this[handler](data, message);
     },
     setupXHR: function(file) {
-        var _self = this;
-        
-        this.xhr.upload.onprogress = function(e) {
-            var percent = 0;
+        let _self = this;
+
+        this.xhr.upload.onprogress = (e) => {
+            let percent = 0;
             if(e.lengthComputable) {
                 percent = e.loaded / e.total;
             }
-            
+
             _self.fireEvent('uploadProgress', file, percent);
         };
-        
-        this.xhr.onreadystatechange = function() {
+
+        this.xhr.onreadystatechange = () => {
             if(4 !== _self.xhr.readyState) {
                 return;
             }
-            
+
             _self.xhr.upload.onprogress = null;
             _self.xhr.onreadystatechange = null;
-            
+
             if(200 === _self.xhr.status) {
                 _self.fireEvent('uploadSuccess', file, _self.xhr.responseText);
             }
-            
+
             // 上传下一个
             _self.startUpload();
         };
-        
+
         this.xhr.open('POST', this.configs.server, true);
-        
+
         if(this.configs.withCredentials) {
             this.xhr.withCredentials = true;
         }
-        
+
         // headers
-        for(var k in this.configs.headers) {
+        for(let k in this.configs.headers) {
             this.xhr.setRequestHeader(k, this.configs.headers[k]);
         }
     },
     clearFileInput: function() {
-        if(null !== this.fileInput) {
-            this.fileInput.value = '';
+        if(null !== this.configs.fileElement) {
+            this.configs.fileElement.value = '';
         }
     },
     initOptions: function(options) {
-        var _self = this;
-        
+        let _self = this;
+
         if(undefined !== options) {
             this.extend(this.configs, options);
         }
-        
+
         // 自动上传
-        this.filesQueuedCompleteHandler = function(obj) {
+        this.filesQueuedCompleteHandler = (obj) => {
             if(_self.configs.auto) {
                 _self.startUpload();
             }
         };
     },
-    initInputComponent: function() {
-        var _self = this;
-        if('' === this.configs.id) {
+    initFileComponent: function() {
+        let _self = this;
+        if(null === this.configs.fileElement) {
             return;
         }
-        
-        this.fileInput = this.doc.getElementById(this.configs.id);
-        this.fileInput.setAttribute('accept', this.configs.accept);
+
+        this.configs.fileElement.setAttribute('accept', this.configs.accept);
         if(this.configs.multiple) {
-            this.fileInput.setAttribute('multiple', 'multiple');
+            this.configs.fileElement.setAttribute('multiple', 'multiple');
         }
-    
-        this.fileInput.onchange = function(e) {
+
+        this.configs.fileElement.onchange = (e) => {
             _self.selectFiles(e.target.files);
         };
     },
     isValidFile: function(file) {
         if(file.size > this.configs.fileSizeLimit) {
-            return false;
+            return {
+                valid: false,
+                type: FileUpload.ERROR_FILE_SIZE_LIMIT,
+                message: 'File is too big'
+            };
         }
-        
+
         if(-1 === this.configs.accept.indexOf(file.extension)) {
-            return false;
+            return {
+                valid: false,
+                type: FileUpload.ERROR_INVALID_FILE_TYPE,
+                message: 'Filetype is invalid'
+            };
         }
-        
-        return true;
+
+        return {
+            valid: true,
+            type: -1,
+            message: ''
+        }
     },
+    /**
+     * 将文件加入到队列
+     * 该方法由 input[type="file"] 控件自动调用 也可以手动调用该方法
+     *
+     * @param {FileList} fileList 原生 FileList 对象
+     */
     selectFiles: function(fileList) {
         if(fileList.length <= 0) {
             return;
         }
-        
+
         if(null === this.filesQueue) {
             this.filesQueue = new FileUpload.Queue();
         }
-        
-        var i = 0;
-        var len = fileList.length;
-        var tmpFile = null;
-        for(; i<len; i++) {
+
+        let len = fileList.length;
+        let tmpFile = null;
+        for(let i=0; i<len; i++) {
             tmpFile = new FileUpload.File(fileList[i]);
-            
+
             // 检查规则
-            if(!this.isValidFile(tmpFile)) {
-                this.fireEvent('fileQueuedError', tmpFile, 'The selected file is invalid');
-                
+            let validate = this.isValidFile(tmpFile);
+            if(!validate.valid) {
+                this.fireEvent('fileQueuedError', tmpFile, validate.type);
+
                 continue;
             }
-            
+
             this.filesQueue.add(tmpFile);
-            
+
             this.fireEvent('fileQueued', tmpFile);
         }
-        
+
         this.fireEvent('filesQueuedComplete', {
             selected: len,
             queued: this.filesQueue.size
         });
     },
     uploadAsFormData: function(file) {
-        var fd = new FormData();
-        
-        for(var k in this.configs.postParams) {
+        let fd = new FormData();
+
+        for(let k in this.configs.postParams) {
             fd.append(k, this.configs.postParams[k]);
         }
-        
+
         fd.append(this.configs.fieldName, file.nativeFile);
-        
+
         this.setupXHR(file);
-        
+
         this.xhr.send(fd);
     },
     uploadAsBinary: function(file) {
-        var _self = this;
-        var fr = new FileReader();
-        
-        fr.onload = function(e) {
+        let _self = this;
+        let fr = new FileReader();
+
+        fr.onload = (e) => {
             _self.xhr.send(this.result);
-            
+
             fr = fr.onload = null;
         };
-        
+
         this.setupXHR(file);
         this.xhr.overrideMimeType('application/octet-stream');
-        
+
         fr.readAsArrayBuffer(file.nativeFile);
     },
     /**
@@ -268,43 +284,46 @@ FileUpload.prototype = {
      * 开始上传
      */
     startUpload: function() {
-        var file = this.filesQueue.take();
-        
+        let file = this.filesQueue.take();
+
         if(null === file) {
             this.filesQueue = null;
             this.clearFileInput();
-            
+
             this.fireEvent('uploadComplete');
-            
+
             return;
         }
-        
+
         if(this.configs.useFormData) {
             this.uploadAsFormData(file);
-            
+
             return;
         }
-        
+
         this.uploadAsBinary(file);
     }
 };
+FileUpload.ERROR_FILE_SIZE_LIMIT = 1;
+FileUpload.ERROR_INVALID_FILE_TYPE = 2;
+
 FileUpload.Queue = function() {
     this.headNode = null;
     this.tailNode = null;
     this.size = 0;
 };
 FileUpload.Queue.prototype.add = function(data) {
-    var node = new FileUpload.QueueNode(data, null);
-    
+    let node = new FileUpload.QueueNode(data, null);
+
     if(0 === this.size) {
         this.headNode = node;
-        
+
     } else {
         this.tailNode.next = node;
     }
-    
+
     this.tailNode = node;
-    
+
     this.size++;
 };
 FileUpload.Queue.prototype.take = function() {
@@ -312,23 +331,49 @@ FileUpload.Queue.prototype.take = function() {
     if(0 === this.size) {
         return null;
     }
-    
-    var data = this.headNode.data;
-    var tmpHeadNode = this.headNode;
-    
+
+    let data = this.headNode.data;
+    let tmpHeadNode = this.headNode;
+
     // 从队列去除头节点
     this.headNode = tmpHeadNode.next;
     tmpHeadNode.next = null;
     tmpHeadNode = null;
-    
+
     // 没节点了
     if(null === this.headNode) {
         this.headNode = this.tailNode = null;
     }
-    
+
     this.size--;
-    
+
     return data;
+};
+FileUpload.Queue.prototype.delete = function(data) {
+    let prev = null;
+    let current = null;
+    for(current = this.headNode; null !== current; prev = current, current = current.next) {
+        if(data === current.data) {
+          // 前一个节点绕过本节点
+          if(null !== prev) {
+            prev.next = current.next
+          }
+
+          // 删除头节点
+          if(current === this.headNode) {
+            this.headNode = current.next;
+          }
+          // 删除尾节点
+          if(current === this.tailNode) {
+            this.tailNode = prev;
+          }
+
+          current.next = null;
+
+          this.size -= 1;
+          break;
+        }
+    }
 };
 FileUpload.Queue.prototype.clear = function() {
     while(0 !== this.size) {
@@ -336,24 +381,24 @@ FileUpload.Queue.prototype.clear = function() {
     }
 };
 FileUpload.Queue.prototype.toArray = function() {
-    var ret = [];
-    
-    var i = 0;
-    var current = null;
+    let ret = [];
+
+    let i = 0;
+    let current = null;
     for(current = this.headNode; null !== current; current = current.next) {
         ret.push(current.data);
         i++;
     }
-    
+
     return ret;
-},
+};
 FileUpload.QueueNode = function(data, next) {
     this.data = data;
     this.next = next;
 };
 FileUpload.File = function(file) {
     this.nativeFile = file;
-    
+
     this.id = 'xef' + FileUpload.File.uuid++;
     /**
      * The name of the file referenced by the File object

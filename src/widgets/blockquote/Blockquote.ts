@@ -25,7 +25,7 @@ class Blockquote extends IWidget {
 
         for(let i=0, len=container.childNodes.length; i<len; i++) {
             if(container.childNodes[i] !== startContainer) {
-                
+
                 blockquote.appendChild( container.childNodes[i].cloneNode(true) );
 
                 continue;
@@ -155,16 +155,16 @@ class Blockquote extends IWidget {
      */
     statusReflect() {
         let range = Editable.getCurrentRange();
-        
+
         if(null === range) {
             return;
         }
-        
+
         let blocked = range.currentInNode('blockquote');
-        
+
         if(blocked) {
             Tools.addClass(this.button, 'active');
-            
+
         } else {
             Tools.removeClass(this.button, 'active');
         }

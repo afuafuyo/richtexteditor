@@ -16,7 +16,7 @@ export default class Range {
 
     constructor(nativeRange) {
         this.nativeRange = nativeRange;
-    
+
         this.collapsed = nativeRange.collapsed;
         this.startContainer = nativeRange.startContainer;
         this.endContainer = nativeRange.endContainer;
@@ -27,15 +27,15 @@ export default class Range {
 
     public static getSingleRangeFromNativeSelection(): any {
         let selection = null;
-        
-        if( null !== (selection = Range.getSelectionFromNative()) ) {        
+
+        if( null !== (selection = Range.getSelectionFromNative()) ) {
             if(0 === selection.rangeCount) {
                 return null;
             }
-            
+
             return new Range(selection.getRangeAt(0));
         }
-        
+
         return null;
     }
 
@@ -43,7 +43,7 @@ export default class Range {
         if('function' === typeof document.createRange) {
             return document.createRange();
         }
-        
+
         return null;
     }
 
@@ -51,7 +51,7 @@ export default class Range {
         if('function' === typeof window.getSelection) {
             return window.getSelection();
         }
-        
+
         return null;
     }
 
@@ -67,7 +67,7 @@ export default class Range {
      */
     public getClosestContainerElement(): any {
         let node = this.startContainer;
-        
+
         return 1 === node.nodeType ? node : node.parentNode;
     }
 
@@ -86,7 +86,7 @@ export default class Range {
         let node: any = basedOnEnd
             ? this.endContainer
             : this.startContainer;
-        
+
         // 文本直接在可编辑容器下面
         if(3 === node.nodeType && Range.TOP_ROLE === node.parentNode.getAttribute('data-role')) {
             return null;
@@ -95,11 +95,11 @@ export default class Range {
         if(1 === node.nodeType && Range.TOP_ROLE === node.getAttribute('data-role')) {
             return null;
         }
-        
+
         while( null !== node && Range.TOP_ROLE !== node.parentNode.getAttribute('data-role') ) {
             node = node.parentNode;
         }
-        
+
         return node;
     }
 
@@ -114,7 +114,7 @@ export default class Range {
         let node: any = basedOnEnd
             ? this.endContainer
             : this.startContainer;
-        
+
         // 文本直接在可编辑容器下面
         if(3 === node.nodeType && Range.TOP_ROLE === node.parentNode.getAttribute('data-role')) {
             return false;
@@ -123,21 +123,21 @@ export default class Range {
         if(1 === node.nodeType && Range.TOP_ROLE === node.getAttribute('data-role')) {
             return false;
         }
-        
+
         while( null !== node ) {
             if(1 === node.nodeType && Range.TOP_ROLE === node.getAttribute('data-role')) {
                 break;
             }
-            
+
             if(nodeName === node.nodeName.toLowerCase()) {
                 ret = true;
-                
+
                 break;
             }
-            
+
             node = node.parentNode;
         }
-        
+
         return ret;
     }
 
@@ -164,37 +164,37 @@ export default class Range {
 
     // public setStart(startNode: any, startOffset: number): void {
     //     this.nativeRange.setStart(startNode, startOffset);
-        
+
     //     this.startContainer = startNode;
     //     this.startOffset = startOffset;
     // }
-    
+
     // public setEnd(endNode: any, endOffset: number): void {
     //     this.nativeRange.setEnd(endNode, endOffset);
-        
+
     //     this.endContainer = endNode;
     //     this.endOffset = endOffset;
     // }
-    
+
     public insertNode(newNode): void {
         this.nativeRange.insertNode(newNode);
     }
-    
+
     public collapse(toStart?: boolean): void {
         this.nativeRange.collapse(toStart);
-        
+
         // this.collapsed = true;
     }
-    
+
     public selectNode(referenceNode: any): void {
         this.nativeRange.selectNode(referenceNode);
-        
+
     //     // 选中节点 属性会变更
     //     this.collapsed = false;
     //     this.startContainer = referenceNode.parentNode;
     //     this.endContainer = referenceNode.parentNode;
     //     this.commonAncestorContainer = referenceNode.parentNode;
-        
+
     //     var i = 0;
     //     for(var len=referenceNode.parentNode.childNodes.length; i<len; i++) {
     //         if(referenceNode === referenceNode.parentNode.childNodes[i]) {
@@ -204,15 +204,15 @@ export default class Range {
     //     this.startOffset = i;
     //     this.endOffset = i + 1;
     }
-    
+
     // public selectNodeContents(referenceNode: any): void {
     //     this.nativeRange.selectNodeContents(referenceNode);
-        
+
     //     this.collapsed = false;
     //     this.startContainer = referenceNode;
     //     this.endContainer = referenceNode;
     //     this.commonAncestorContainer = referenceNode;
-        
+
     //     this.startOffset = 0;
     //     // If the nodeType of referenceNode is one of Text, Comment, or CDATASection
     //     // then the endOffset is the number of characters contained in the reference node.
@@ -220,14 +220,14 @@ export default class Range {
     //     // endOffset is the number of child nodes.
     //     if(3 === referenceNode.nodeType || 4 === referenceNode.nodeType
     //         || 8 === referenceNode.nodeType) {
-            
+
     //         this.endOffset = referenceNode.nodeValue.length;
-            
+
     //     } else {
     //         this.endOffset = referenceNode.childNodes.length;
     //     }
     // }
-    
+
     public deleteContents(): void {
         this.nativeRange.deleteContents();
     }

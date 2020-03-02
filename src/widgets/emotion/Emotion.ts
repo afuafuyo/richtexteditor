@@ -1,8 +1,9 @@
 import Editor from '../../Editor';
 import Editable from '../../Editable';
-import Tools from '../../Tools';
 
 import IWidget from '../IWidget';
+
+import Pop from '../../com/Pop';
 
 /**
  * emotion
@@ -11,7 +12,7 @@ class Emotion extends IWidget {
     public button: any;
     public editor: any;
 
-    public popWrapper: any;
+    public pop: any;
 
     constructor(button: any, editor: any) {
         super(editor);
@@ -19,16 +20,13 @@ class Emotion extends IWidget {
         this.button = button;
         this.editor = editor;
 
-        this.popWrapper = null;
-
-        this.init();
-        this.bindEvent();
+        this.pop = null;
     }
 
-    private init(): void {
+    private getHtml(): string {
         let html =
             ['<div class="xeditor-emotion-wrapper">',
-                '<div class="xeditor-pop-tabs">',
+                '<div class="xeditor-tabs">',
                     '<a class="active" href="javascript:;">精选</a>',
                 '</div>',
                 '<div class="xeditor-emotion-content">',
@@ -46,60 +44,61 @@ class Emotion extends IWidget {
                     '<a class="xeditor-emotion-item" href="javascript:;" title="加油" data-em="ᕦ(ò_óˇ)ᕤ">ᕦ(ò_óˇ)ᕤ</a>',
                 '</div>',
             '</div>'].join('');
-       
-        let doc = this.button.ownerDocument;
-        
-        this.popWrapper = doc.createElement('div');
-        this.popWrapper.className = 'xeditor-pop-wrapper';
-        this.popWrapper.innerHTML = html;
+
+        return html;
     }
 
     private bindEvent(): void {
         let _self = this;
-        
-        this.popWrapper.onclick = (e) => {
+
+        this.pop.getWrapperDom().onclick = (e) => {
             // 阻止冒泡
             if(e.stopPropagation) {
                 e.stopPropagation();
             }
-            
+
             let target = e.target;
             let em = target.getAttribute('data-em');
-            
+
             if(null !== em) {
                 Editable.insertHtml(Editable.TYPE_TEXT, em);
-                
+
                 _self.close();
             }
         };
-        
+
         // 点击空白关闭
         this.button.ownerDocument.addEventListener('click', (e) => {
             var t = e.target;
-            
+
             // 点击按钮要执行打开操作
             if('emotion' === t.getAttribute('data-internalwidgetaction')) {
                 return;
             }
-            
+
             _self.close();
         });
     }
 
     private close() {
-        this.popWrapper.style.display = 'none';
+        this.pop.getWrapperDom().style.display = 'none';
     }
 
     /**
      * @inheritdoc
      */
     onClick(editor: any) {
-        if(!Tools.hasChild(this.button.parentNode, this.popWrapper)) {
-            this.button.parentNode.appendChild(this.popWrapper);
-            this.popWrapper.style.left = this.button.offsetLeft + 'px';
+        if(null === this.pop) {
+            this.pop = Pop.getInstance();
+            this.pop.getContentDom().innerHTML = this.getHtml();
+
+            this.button.parentNode.appendChild(this.pop.getWrapperDom());
+            this.pop.getWrapperDom().style.left = this.button.offsetLeft + 'px';
+
+            this.bindEvent();
         }
-        
-        this.popWrapper.style.display = 'block';
+
+        this.pop.getWrapperDom().style.display = 'block';
     }
 
     /**

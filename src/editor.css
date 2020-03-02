@@ -1,6 +1,74 @@
 /**
  * util
  */
+.xeditor-clear {
+    height: 1px;
+    overflow: hidden;
+    font-size: 0;
+    clear: both;
+}
+.xeditor-btn {
+    display: inline-block;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 15px;
+    color: #7fbbe2;
+    text-align: center;
+    font-size: 12px;
+    margin-left: 10px;
+    border: 1px solid #7fbbe2;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.xeditor-btn.active {
+    color: #fff;
+    background-color: #7fbbe2;
+}
+
+
+/**
+ * form item
+ */
+.xeditor-form-item {
+    margin-top: 10px;
+    border: 1px solid #e7eaf1;
+    border-radius: 3px;
+    transition: border-color .2s linear;
+}
+.xeditor-form-item.active {
+    border-color: #00a1d6;
+}
+.xeditor-form-item input[type="text"] {
+    display: inline-block;
+    box-sizing: border-box;
+    height: 28px;
+    width: 100%;
+    padding: 0 8px;
+    border: 0;
+    outline: none;
+}
+
+/**
+ * tabs
+ */
+.xeditor-tabs a {
+    display: inline-block;
+    line-height: 36px;
+    padding: 0 10px;
+    color: #999;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid #fff;
+}
+.xeditor-tabs a.active {
+    color: #7fbbe2;
+    border-bottom-color: #7fbbe2;
+}
+
+
+/**
+ * pop dialog
+ */
 .xeditor-pop-wrapper {
     position: absolute;
     top: 40px;
@@ -32,71 +100,54 @@
 .xeditor-pop-close:hover {
     background-position: -50px -30px;
 }
-.xeditor-pop-tabs {
-    height: 40px;
-    border-bottom: 1px solid #ccc;
-}
-.xeditor-pop-tabs a {
-    display: inline-block;
-    line-height: 40px;
-    font-size: 14px;
-    color: #555;
-    padding: 0 12px;
-    text-decoration: none;
-}
-.xeditor-pop-tabs a:hover,
-.xeditor-pop-tabs a.active {
-    color: #00a1d6;
-    border-bottom: 1px solid #00a1d6;
-}
-.xeditor-clear {
-    height: 1px;
-    overflow: hidden;
-    font-size: 0;
-    clear: both;
-}
-.xeditor-btn {
-    display: inline-block;
-    padding: 4px 0;
-    width: 80px;
-    text-align: center;
-    font-size: 14px;
-    background-color: #fff;
-    color: #6e6e6e;
-    cursor: pointer;
-    border: 1px solid #dadada;
-    border-radius: 2px;
-}
-.xeditor-btn-primary {
-    color: #fff;
-    background-color: #00a1d6;
-    border-color: #00a1d6;
-}
-.xeditor-pop-footer {
-    padding: 8px 10px 8px 10px;
-    text-align: right;
-}
-.xeditor-inputtext-wrapper {
-    margin-top: 10px;
-    padding: 0 8px;
-    border: 1px solid #e7eaf1;
-    border-radius: 3px;
-    transition: border-color .2s linear;
-}
-.xeditor-inputtext-wrapper.active {
-    border-color: #00a1d6;
-}
-.xeditor-inputtext-wrapper input[type="text"] {
-    display: inline-block;
-    height: 28px;
+.xeditor-pop-content {}
+
+
+/**
+ * modal dialog
+ */
+.xeditor-modal-mask {
+    position: fixed;
+    z-index: 1000;
     width: 100%;
-    border: 0;
-    outline: none;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, .5);
+}
+.xeditor-modal-wrapper {
+    position: relative;
+    width: 320px;
+    background-color: #fff;
+    border-radius: 5px;
+}
+.xeditor-modal-close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: block;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    background: url(./icons/icon-all.png) no-repeat -45px -25px;
+}
+.xeditor-modal-header {
+    height: 32px;
+    line-height: 32px;
+    padding: 10px 10px;
+    font-size: 16px;
+}
+.xeditor-modal-footer {
+    padding: 10px 10px;
+    text-align: right;
 }
 
 
 /**
- * main
+ * main editor
  */
 .xeditor-wrapper {
     border-bottom: 1px solid #e7eaf1;
@@ -187,7 +238,9 @@
 }
 
 
-/* emotion */
+/**
+ * emotion
+ */
 .xeditor-emotion-wrapper {
     width: 400px;
 }
@@ -234,24 +287,11 @@
 
 
 /* image */
-.xeditor-uploadimage-wrapper {
-    width: 400px;
-}
-.xeditor-dialog-tabs a {
-    display: inline-block;
-    line-height: 40px;
-    padding: 0 10px;
-    color: #000;
-    text-decoration: none;
-    font-size: 14px;
-    border-bottom: 1px solid #fff;
-}
-.xeditor-dialog-tabs a.active {
-    border-bottom-color: #00a1d6;
-}
+.xeditor-uploadimage-wrapper {}
 .xeditor-uploadimage-content {}
 .xeditor-uploadimage-content-local {
-    height: 132px;
+    height: 150px;
+    margin-top: 10px;
     overflow: hidden;
 }
 .xeditor-uploadimage-content-remote {
@@ -268,15 +308,14 @@
 }
 .xeditor-uploadimage-imageitem {
     position: relative;
-    width: 120px;
-    height: 120px;
-    float: left;
-    margin: 10px 0 0 10px;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
     background-color: #eee;
     overflow: hidden;
 }
 .xeditor-uploadimage-imageitem img {
-    width: 120px;
+    max-width: 100%;
 }
 .xeditor-uploadimage-imageitem:hover .xeditor-uploadimage-delete {
     display: inline-block;
@@ -285,11 +324,12 @@
 }
 .xeditor-uploadimage-progress {
     position: absolute;
-    left: 10px;
-    top: 60px;
+    left: 50%;
+    top: 50%;
     display: block;
     height: 6px;
     width: 100px;
+    margin-left: -50px;
     overflow: hidden;
     border: 1px solid #00a1d6;
     border-radius: 2px;
@@ -316,13 +356,12 @@
     display: none;
 }
 .xeditor-uploadimage-uploadbtn {
-    width: 116px;
-    height: 116px;
-    float: left;
-    margin-top: 10px;
-    margin-left: 10px;
+    height: 146px;
+    margin-right: 20px;
+    margin-left: 20px;
     background: url(./icons/upload.png) no-repeat center center;
     border: 2px dashed #b3b3b3;
+    border-radius: 5px;
 }
 .xeditor-uploadimage-uploadbtn:hover {
     border-color: #00a1d6;
@@ -332,10 +371,6 @@
     width: 100%;
     opacity: 0;
     cursor: pointer;
-}
-.xeditor-dialog-footer {
-    margin: 10px;
-    text-align: right;
 }
 
 
