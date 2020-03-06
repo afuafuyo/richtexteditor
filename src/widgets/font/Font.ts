@@ -1,4 +1,3 @@
-import Editor from '../../Editor';
 import Editable from '../../Editable';
 import Tools from '../../Tools';
 
@@ -9,7 +8,7 @@ import Pop from '../../com/Pop';
 /**
  * font
  */
-class Font extends IWidget {
+export default class Font extends IWidget {
     public button: any;
     public editor: any;
 
@@ -179,4 +178,3 @@ class Font extends IWidget {
         }
     }
 }
-Editor.registerWidgetController('font', Font);

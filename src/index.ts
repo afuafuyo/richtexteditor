@@ -1,9 +1,22 @@
 import Editor from './Editor';
 
-import './widgets/bold/Bold';
-import './widgets/Blockquote/Blockquote';
-import './widgets/font/Font';
-import './widgets/emotion/Emotion';
-import './widgets/image/Image';
+import IWidget from './widgets/IWidget';
+import Editable from './Editable';
+import Tools from './Tools';
 
+import Bold from './widgets/bold/Bold';
+import Blockquote from './widgets/Blockquote/Blockquote';
+import Font from './widgets/font/Font';
+import Emotion from './widgets/emotion/Emotion';
+import Image from './widgets/image/Image';
+
+Editor.registerWidgetController('bold', Bold);
+Editor.registerWidgetController('blockquote', Blockquote);
+Editor.registerWidgetController('font', Font);
+Editor.registerWidgetController('emotion', Emotion);
+Editor.registerWidgetController('image', Image);
+
+Editor.IWidget = IWidget;
+Editor.Editable = Editable;
+Editor.Tools = Tools;
 export default Editor;

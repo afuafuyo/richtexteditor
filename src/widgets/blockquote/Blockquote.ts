@@ -1,4 +1,3 @@
-import Editor from '../../Editor';
 import Editable from '../../Editable';
 import Tools from '../../Tools';
 
@@ -7,7 +6,7 @@ import IWidget from '../IWidget';
 /**
  * Blockquote
  */
-class Blockquote extends IWidget {
+export default class Blockquote extends IWidget {
     public button: any;
     public editor: any;
 
@@ -170,4 +169,3 @@ class Blockquote extends IWidget {
         }
     }
 }
-Editor.registerWidgetController('blockquote', Blockquote);

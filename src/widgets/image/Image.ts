@@ -1,6 +1,4 @@
-import Editor from '../../Editor';
 import Editable from '../../Editable';
-import Tools from '../../Tools';
 
 import IWidget from '../IWidget';
 
@@ -22,7 +20,7 @@ import FileUploader from '../../com/FileUploader';
  *      }
  * }
  */
-class Image extends IWidget {
+export default class Image extends IWidget {
     public button: any;
     public editor: any;
 
@@ -264,4 +262,3 @@ class Image extends IWidget {
      */
     statusReflect() {}
 }
-Editor.registerWidgetController('image', Image);

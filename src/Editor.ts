@@ -24,6 +24,9 @@ import Tools from './Tools';
  * editor.render(document.getElementById('wrapper'));
  */
 export default class Editor {
+    public static IWidget: any;
+    public static Tools: Tools;
+    public static Editable: Editable;
 
     /**
      * 具有 UI 的部件
@@ -42,9 +45,6 @@ export default class Editor {
     public static registerWidgetController(name: string, processer: any): void {
         Editor.widgetControllers[name] = processer;
     }
-
-    public static Tools = Tools;
-
 
     public doc: Document;
 

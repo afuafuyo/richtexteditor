@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <script src="../dist/editor.js"></script>
-    <link rel="stylesheet" href="../dist/editor.css">
+    <script src="./js.js"></script>
+    <link rel="stylesheet" href="../dist/editor.css" />
+    <style type="text/css">
+    .xeditor-icon-mywidget {border: 1px solid red; background-image: none;}
+    </style>
 </head>
 <body>
 <div style="width: 900px; margin: 0 auto; border: 1px solid red">
@@ -16,72 +20,11 @@
     <button onclick="getPlainText()">获取text内容</button>
     <button onclick="destroy()">销毁</button>
 </div>
-    
+
 <script>
-/**
- * 滚动定位
- */
-function ScrollFix(editor, options) {
-    this.editor = editor;
-    this.options = options;
-    
-    editor.on('ready', this.handler, this);
-}
-ScrollFix.prototype = {
-    constructor: ScrollFix,
-    getOffset: function(elem) {
-        if ( !elem.getClientRects().length ) {
-            return { top: 0, left: 0 };
-        }
-    
-        let rect = elem.getBoundingClientRect();
-        let doc = elem.ownerDocument;
-        let docElem = doc.documentElement;
-        let win = doc.defaultView;
-
-        return {
-            top: rect.top + win.pageYOffset - docElem.clientTop,
-            left: rect.left + win.pageXOffset - docElem.clientLeft
-        };
-    },
-    handler: function() {
-        var _self = this;
-
-        this.bar = this.editor.widgetsWrapper;
-        this.barWidth = this.bar.clientWidth;
-        this.barOffset = this.getOffset(this.bar);
-
-        window.addEventListener('resize', function() {
-            _self.barOffset = _self.getOffset(_self.bar);
-        });
-        window.addEventListener("scroll", function () {
-            _self.scrollHandler();
-        });
-    },
-    scrollHandler: function() {
-        var navHeight = this.options.top;
-        
-        var startFixPos = this.barOffset.top - navHeight;
-
-        if(document.documentElement) {
-            if(document.documentElement.scrollTop > startFixPos) {
-                this.bar.style.position = 'fixed';
-                this.bar.style.zIndex = '100';
-                this.bar.style.top = navHeight + 'px';
-                this.bar.style.left = this.barOffset.left + 'px';
-                this.bar.style.width = this.barWidth + 'px';
-
-            } else {
-                this.bar.removeAttribute('style');
-            }
-        }
-    }
-};
-
-
 var editor = new XEditor({
     autoFocus: true,
-    widgets: ['bold', 'font', 'blockquote', '-', 'emotion', 'image'],
+    widgets: ['mywidget', 'font', 'blockquote', '-', 'emotion', 'image'],
     widgetsOptions: {
         image: {
             accept: 'image/jpg, image/jpeg, image/png',

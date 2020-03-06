@@ -1,4 +1,3 @@
-import Editor from '../../Editor';
 import Editable from '../../Editable';
 import Tools from '../../Tools';
 
@@ -7,7 +6,7 @@ import IWidget from '../IWidget';
 /**
  * bold
  */
-class Bold extends IWidget {
+export default class Bold extends IWidget {
     public button: any;
     public editor: any;
 
@@ -52,4 +51,3 @@ class Bold extends IWidget {
         Tools.removeClass(this.button, 'active');
     }
 }
-Editor.registerWidgetController('bold', Bold);

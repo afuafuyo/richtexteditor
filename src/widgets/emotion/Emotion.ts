@@ -1,4 +1,3 @@
-import Editor from '../../Editor';
 import Editable from '../../Editable';
 
 import IWidget from '../IWidget';
@@ -8,7 +7,7 @@ import Pop from '../../com/Pop';
 /**
  * emotion
  */
-class Emotion extends IWidget {
+export default class Emotion extends IWidget {
     public button: any;
     public editor: any;
 
@@ -110,4 +109,3 @@ class Emotion extends IWidget {
      */
     statusReflect() {}
 }
-Editor.registerWidgetController('emotion', Emotion);
