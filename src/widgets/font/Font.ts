@@ -72,7 +72,11 @@ class Font extends IWidget {
     }
 
     private close() {
-        this.pop.getWrapperDom().style.display = 'none';
+        if(null !== this.pop) {
+            this.pop.getWrapperDom().style.display = 'none';
+        }
+
+        this.pop = null;
     }
 
     public setFont(role: string): void {

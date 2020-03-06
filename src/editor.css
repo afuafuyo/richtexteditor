@@ -197,6 +197,7 @@
     background-image: url(./icons/icon-all.png);
     background-repeat: no-repeat;
     background-color: transparent;
+    background-size: 30px auto;
     border: 0;
     vertical-align: top;
     outline: none;
@@ -207,34 +208,25 @@
     background-color: #ebebeb;
 }
 .xeditor-icon-bold {
-    background-position: 10px 8px;
+    background-position: 0 -2px;
 }
 .xeditor-icon-font {
-    background-position: 8px -237px;
+    background-position: 0 -35px;
 }
 .xeditor-icon-emotion {
-    background-position: 5px -163px;
+    background-position: 0 -98px;
 }
 .xeditor-icon-link {
-    background-position: 5px -516px;
+    background-position: 0 -194px;
 }
 .xeditor-icon-image {
-    background-position: 6px -120px;
+    background-position: 0 -130px;
 }
 .xeditor-icon-blockquote {
-    background-position: 7px -354px;
-}
-.xeditor-icon-italic {
-    background-position: 10px -276px;
-}
-.xeditor-icon-align {
-    background-position: 8px -455px;
+    background-position: 0 -162px;
 }
 .xeditor-icon-separator {
     background-position: 6px -388px;
-}
-.xeditor-icon-code {
-    background-position: 6px -589px;
 }
 
 

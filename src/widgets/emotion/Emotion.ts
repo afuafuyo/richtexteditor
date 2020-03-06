@@ -81,7 +81,11 @@ class Emotion extends IWidget {
     }
 
     private close() {
-        this.pop.getWrapperDom().style.display = 'none';
+        if(null !== this.pop) {
+            this.pop.getWrapperDom().style.display = 'none';
+        }
+
+        this.pop = null;
     }
 
     /**
