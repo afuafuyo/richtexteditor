@@ -253,7 +253,7 @@ export default class Editor {
     }
 
     public handlerKeydownEvent(e: any): void {
-        this.fire('keydown');
+        this.fire('keydown', e);
     }
 
     public handlerKeyupEvent(e: any): void {
@@ -266,14 +266,14 @@ export default class Editor {
 
         Editable.backupCurrentRange();
 
-        this.fire('keyup', null);
+        this.fire('keyup', e);
         this.fire('selectionchange');
     }
 
     public handlerContentClickEvent(e: any): void {
         Editable.backupCurrentRange();
 
-        this.fire('contentFocus', null);
+        this.fire('contentFocus', e);
         this.fire('selectionchange');
     }
 
@@ -471,7 +471,7 @@ export default class Editor {
      * @param {String} eventName
      * @param {any} data
      */
-    public fire(eventName: string, data?: any): void {
+    public fire(eventName: string, data: any = null): void {
         let map = this.eventBinMap;
 
         if(undefined === map[eventName]) {
