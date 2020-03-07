@@ -132,7 +132,9 @@
     width: 22px;
     height: 22px;
     cursor: pointer;
-    background: url(./icons/icon-all.png) no-repeat -45px -25px;
+    font-size: 22px;
+    line-height: 22px;
+    text-align: center;
 }
 .xeditor-modal-header {
     height: 32px;

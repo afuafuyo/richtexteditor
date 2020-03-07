@@ -47,6 +47,7 @@ export default class Dialog {
 
         this.closeIcon = this.doc.createElement('span');
         this.closeIcon.className = 'xeditor-modal-close';
+        this.closeIcon.innerHTML = '&times;';
 
         this.headerWrapper = this.doc.createElement('div');
         this.headerWrapper.className = 'xeditor-modal-header';
