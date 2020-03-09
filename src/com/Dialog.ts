@@ -14,8 +14,10 @@ export default class Dialog {
     cancelButton: any;
     onOk: any;
 
-    static _instance = null;
+    static BTN_OK: number = 1;
+    static BTN_CANCEL: number = 2;
 
+    static _instance = null;
     static getInstance() {
         if(null === Dialog._instance) {
             Dialog._instance = new Dialog();
@@ -37,7 +39,7 @@ export default class Dialog {
         this.onOk = null;
     }
 
-    initDom(content, title) {
+    initDom(content, title, btn) {
         // mask
         this.mask = this.doc.createElement('div');
         this.mask.className = 'xeditor-modal-mask';
@@ -66,12 +68,23 @@ export default class Dialog {
         this.cancelButton.className = 'xeditor-btn';
         this.cancelButton.innerHTML = '取消';
 
-        this.footerWrapper.appendChild(this.cancelButton);
-        this.footerWrapper.appendChild(this.okButton);
+        if( Dialog.BTN_CANCEL === btn || (Dialog.BTN_CANCEL | Dialog.BTN_OK) === btn ) {
+            this.footerWrapper.appendChild(this.cancelButton);
+        }
+        if( Dialog.BTN_OK === btn || (Dialog.BTN_CANCEL | Dialog.BTN_OK) === btn ) {
+            this.footerWrapper.appendChild(this.okButton);
+        }
+
         this.wrapper.appendChild(this.closeIcon);
         this.wrapper.appendChild(this.headerWrapper);
         this.wrapper.appendChild(this.contentWrapper);
-        this.wrapper.appendChild(this.footerWrapper);
+
+        if( Dialog.BTN_CANCEL === btn
+            || Dialog.BTN_OK === btn
+            || (Dialog.BTN_CANCEL | Dialog.BTN_OK) === btn ) {
+            this.wrapper.appendChild(this.footerWrapper);
+        }
+
         this.mask.appendChild(this.wrapper);
     }
 
@@ -116,8 +129,8 @@ export default class Dialog {
      *
      * @param content 内容
      */
-    open(content, title = '') {
-        this.initDom(content, title);
+    open(content, title = '', btn = (Dialog.BTN_OK | Dialog.BTN_CANCEL)) {
+        this.initDom(content, title, btn);
         this.initEvent();
 
         this.render();
