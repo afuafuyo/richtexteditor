@@ -142,6 +142,7 @@ export default class Image extends IWidget {
         // 选完文件手动调用上传
         this.uploader.filesQueuedCompleteHandler = (obj) => {
             if(undefined === options.image.beforeUpload) {
+                _self.uploader.configs.server = options.image.server;
                 _self.uploader.startUpload();
                 return;
             }
