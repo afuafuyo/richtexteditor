@@ -196,36 +196,37 @@
     width: 30px;
     height: 30px;
     margin: 0 5px;
-    background-image: url(./icons/icon-all.png);
     background-repeat: no-repeat;
     background-color: transparent;
-    background-size: 30px auto;
+    background-position: 4px 4px;
+    background-size: 22px 22px;
     border: 0;
     vertical-align: top;
     outline: none;
     transition: background-color .2s linear;
+    border-radius: 4px;
 }
 .xeditor-icon:hover,
 .xeditor-icon.active {
     background-color: #ebebeb;
 }
 .xeditor-icon-bold {
-    background-position: 0 -2px;
+    background-image: url(./icons/bold.png);
 }
 .xeditor-icon-font {
-    background-position: 0 -35px;
+    background-image: url(./icons/font.png);
 }
 .xeditor-icon-emotion {
-    background-position: 0 -98px;
+    background-image: url(./icons/emotion.png);
 }
 .xeditor-icon-link {
-    background-position: 0 -194px;
+    background-image: url(./icons/link.png);
 }
 .xeditor-icon-image {
-    background-position: 0 -130px;
+    background-image: url(./icons/image.png);
 }
 .xeditor-icon-blockquote {
-    background-position: 0 -162px;
+    background-image: url(./icons/quote.png);
 }
 .xeditor-icon-separator {
     background-position: 6px -388px;

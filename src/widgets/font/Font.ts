@@ -2,7 +2,6 @@ import Editable from '../../Editable';
 import Tools from '../../Tools';
 
 import IWidget from '../IWidget';
-
 import Pop from '../../com/Pop';
 
 /**
