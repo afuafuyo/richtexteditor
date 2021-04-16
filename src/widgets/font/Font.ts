@@ -6,6 +6,14 @@ import Pop from '../../com/Pop';
 
 /**
  * font
+ *
+ * widgetsOptions: {
+ *      font: {
+ *          list: [
+ *              {title: '标题1', tag: 'h1'}
+ *          ]
+ *      }
+ * }
  */
 export default class Font extends IWidget {
     public button: any;
@@ -26,11 +34,23 @@ export default class Font extends IWidget {
     }
 
     private getHtml(): string {
+        let lineMode = this.editor.configs.lineMode
+        let options = this.editor.configs.widgetsOptions.font;
+        let list = [{ title: '标题', tag: 'h2' }];
+
+        if(options && options.list) {
+            list = options.list;
+        }
+
+        let str = '';
+        for(let i=0; i<list.length; i++) {
+            str += `<${list[i].tag} data-role="${list[i].tag}" class="${this.nowFont === list[i].tag ? 'active' : ''}">${list[i].title}</${list[i].tag}>`;
+        }
+
         let html = [
             '<div class="xeditor-font-wrapper">',
-                '<h1 data-role="h1" class="'+ (this.nowFont === 'h1' ? 'active' : '') +'">标题1</h1>',
-                '<h2 data-role="h2" class="'+ (this.nowFont === 'h2' ? 'active' : '') +'">标题2</h2>',
-                '<p data-role="normal">正文</p>',
+                str,
+                `<${lineMode} data-role="${lineMode}">正文</${lineMode}>`,
             '</div>'
         ].join('');
 
@@ -97,36 +117,20 @@ export default class Font extends IWidget {
         }
 
         // 点击相同不做处理
-        if('h1' === nodeName || 'h2' === nodeName) {
+        if('h1' === nodeName || 'h2' === nodeName || 'h3' === nodeName || 'h4' === nodeName || 'h5' === nodeName || 'h6' === nodeName) {
             if(role === this.nowFont) {
                 return;
             }
         }
+        tag = role;
 
-        if('h1' === role) {
-            tag = 'h1';
-        }
-        if('h2' === role) {
-            tag = 'h2';
-        }
+        // 替换元素
+        let newNode = this.button.ownerDocument.createElement(tag);
+        newNode.innerHTML = outer.innerHTML;
+        outer.parentNode.replaceChild(newNode, outer);
 
-        switch(role) {
-            case 'h1':
-            case 'h2':
-            case 'normal':
-                let newNode = this.button.ownerDocument.createElement(tag);
-                newNode.innerHTML = outer.innerHTML;
-
-                outer.parentNode.replaceChild(newNode, outer);
-
-                this.nowFont = role;
-
-                Editable.resetRangeAt(newNode, true);
-
-                break;
-            default:
-                break;
-        }
+        this.nowFont = role;
+        Editable.resetRangeAt(newNode, true);
 
         this.editor.fire('selectionchange');
     }
@@ -162,9 +166,16 @@ export default class Font extends IWidget {
         let font = '';
         if(range.currentInNode('h1')) {
             font = 'h1';
-
         } else if(range.currentInNode('h2')) {
             font = 'h2';
+        } else if(range.currentInNode('h3')) {
+            font = 'h3';
+        } else if(range.currentInNode('h4')) {
+            font = 'h4';
+        } else if(range.currentInNode('h5')) {
+            font = 'h5';
+        } else if(range.currentInNode('h6')) {
+            font = 'h6';
         }
 
         this.nowFont = font;

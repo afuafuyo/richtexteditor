@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="../dist/editor.css" />
     <style type="text/css">
     .xeditor-icon-mywidget {border: 1px solid red; background-image: none;}
+    blockquote {
+        border-left: 2px solid #ccc;
+        padding-left: 10px;
+    }
+    blockquote p {
+        padding: 0;
+        margin: 10px 0;
+    }
     </style>
 </head>
 <body>
@@ -35,6 +43,12 @@ var editor = new XEditor({
                     params: {age: 1}
                 });
             },
+        },
+        font: {
+            list: [
+                {title: '标题1', tag: 'h1'},
+                {title: '标题2', tag: 'h2'}
+            ]
         }
     },
     plugins: [{

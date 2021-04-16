@@ -119,6 +119,7 @@ export default class Editor {
             reactionTime: 200,
             plugins: [],
             widgets: [],
+            widgetsOptions: {},
             minHeight: '200',
             contentClassName: '',
             lineMode: 'p'
