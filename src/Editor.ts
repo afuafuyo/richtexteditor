@@ -178,7 +178,9 @@ export default class Editor {
             this.widgetsWrapper.appendChild(item);
         }
 
-        this.fragment.appendChild(this.widgetsWrapper);
+        let wrapper = this.doc.createElement('div');
+        wrapper.appendChild(this.widgetsWrapper);
+        this.fragment.appendChild(wrapper);
     }
 
     public initContentStructure(): void {

@@ -29,7 +29,7 @@ ScrollFix.prototype = {
 
         this.bar = this.editor.widgetsWrapper;
         this.barWidth = this.bar.clientWidth;
-        this.barOffset = this.getOffset(this.bar);
+        this.barOffset = this.getOffset(this.bar.parentNode);
 
         window.addEventListener('resize', function() {
             _self.barOffset = _self.getOffset(_self.bar);
@@ -41,7 +41,17 @@ ScrollFix.prototype = {
     scrollHandler: function() {
         var navHeight = this.options.top;
 
+        var scrollTop = window.pageYOffset;
         var startFixPos = this.barOffset.top - navHeight;
+
+        var htmlHeight = this.editor.root.scrollHeight;
+        var contentBottomPos = this.barOffset.top + htmlHeight;
+
+        // 内容滚动到屏幕上面 就隐藏工具栏
+        if(scrollTop > contentBottomPos) {
+            this.bar.removeAttribute('style');
+            return;
+        }
 
         if(document.documentElement) {
             if(document.documentElement.scrollTop > startFixPos) {
